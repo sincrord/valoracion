@@ -204,11 +204,15 @@ class ValoracionPromptTemplate(models.Model):
                 'output_schema': OUTPUT_SCHEMA,
                 'version': VERSION,
             })
-            rec.message_post(body=_(
-                "Plantilla restaurada al wording oficial v%s. "
-                "Se sobreescribieron: system_prompt, user_prompt_template, "
-                "output_schema. Se preservaron: name, is_default, active, notes."
-            ) % VERSION)
+            # Microfix 3.1.1: el modelo NO hereda mail.thread; protegemos
+            # message_post para no romper la acción ni revertir el write.
+            if hasattr(rec, 'message_post'):
+                rec.message_post(body=_(
+                    "Plantilla restaurada al wording oficial v%s. "
+                    "Se sobreescribieron: system_prompt, user_prompt_template, "
+                    "output_schema. Se preservaron: name, is_default, active, "
+                    "notes."
+                ) % VERSION)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -251,12 +255,16 @@ class ValoracionPromptTemplate(models.Model):
                 'output_schema': V5_OUTPUT_SCHEMA,
                 'version': V5_VERSION,
             })
-            rec.message_post(body=_(
-                "Plantilla actualizada al wording v%s. Se sobreescribieron: "
-                "system_prompt, user_prompt_template, output_schema. Se "
-                "preservaron: name, is_default, active, notes. Para "
-                "rollback, usar 'Restaurar v4.1 oficial'."
-            ) % V5_VERSION)
+            # Microfix 3.1.1: el modelo NO hereda mail.thread; protegemos
+            # message_post para no romper la acción ni revertir el write.
+            if hasattr(rec, 'message_post'):
+                rec.message_post(body=_(
+                    "Plantilla actualizada al wording v%s. Se "
+                    "sobreescribieron: system_prompt, user_prompt_template, "
+                    "output_schema. Se preservaron: name, is_default, "
+                    "active, notes. Para rollback, usar "
+                    "'Restaurar v4.1 oficial'."
+                ) % V5_VERSION)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
