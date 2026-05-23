@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Inherit res.config.settings.view.form para añadir el bloque
+        "Valoración VitalHealth" como un App propio dentro de Ajustes.
+
+        El layout usa la sintaxis moderna Odoo 18:
+            <app> > <block> > <setting>
+
+        El App es visible solo para Administrador del módulo
+        (groups en el <app> filtra completamente la sección).
+    -->
+    <record id="res_config_settings_view_form_inherit_valoracion" model="ir.ui.view">
+        <field name="name">res.config.settings.form.inherit.valoracion</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Valoración VitalHealth"
+                     string="Valoración VitalHealth"
+                     name="valoracion"
+                     groups="valoracion.group_valoracion_admin">
+
+                    <block title="Activación" name="ia_activacion">
+                        <setting id="ia_activa"
+                                 string="IA activa"
+                                 help="Habilita la generación con IA. Si está desactivada, el botón Generar Valoración lanza error.">
+                            <field name="valoracion_ia_activa"/>
+                        </setting>
+                        <setting id="ia_proveedor"
+                                 string="Proveedor IA activo"
+                                 help="Proveedor que se usará al pulsar Generar Valoración. Configura las credenciales y modelo de cada proveedor en los bloques de abajo.">
+                            <field name="valoracion_ia_proveedor"/>
+                        </setting>
+                        <setting id="biocuantico_motor_version"
+                                 string="Motor BioCuántico"
+                                 help="Selector del motor de parsing BioCuántico. legacy = parser actual (estable). v3 = pipeline puro nuevo (extractor → classifier → severity → ranker → master_summary). Si v3 falla, el sistema hace fallback automático a legacy SIN romper la valoración.">
+                            <field name="valoracion_biocuantico_motor_version"/>
+                        </setting>
+                    </block>
+
+                    <block title="Claude (Anthropic)"
+                           name="ia_claude_block">
+                        <setting id="ia_modelo_claude"
+                                 string="Modelo Claude"
+                                 help="Identificador del modelo. Ej: claude-sonnet-4-5, claude-opus-4-6, claude-haiku-4-5.">
+                            <field name="valoracion_ia_modelo"
+                                   placeholder="claude-sonnet-4-5"/>
+                        </setting>
+                        <setting id="ia_api_key_claude"
+                                 string="API Key Claude"
+                                 help="Clave de acceso a Claude (Anthropic). NUNCA se incluye en logs ni en el reporte PDF.">
+                            <field name="valoracion_ia_api_key"
+                                   password="True"/>
+                        </setting>
+                        <setting id="ia_endpoint_claude"
+                                 string="Endpoint Claude"
+                                 help="URL del endpoint de Anthropic Messages API.">
+                            <field name="valoracion_ia_endpoint_url"
+                                   placeholder="https://api.anthropic.com/v1/messages"/>
+                        </setting>
+                    </block>
+
+                    <block title="OpenAI"
+                           name="ia_openai_block">
+                        <setting id="ia_modelo_openai"
+                                 string="Modelo OpenAI"
+                                 help="Identificador del modelo. Ej: gpt-4o, gpt-4.1, gpt-4o-mini. Para imágenes multimodales usa gpt-4o.">
+                            <field name="valoracion_ia_openai_modelo"
+                                   placeholder="gpt-4o"/>
+                        </setting>
+                        <setting id="ia_api_key_openai"
+                                 string="API Key OpenAI"
+                                 help="Clave de acceso a OpenAI. NUNCA se incluye en logs ni en el reporte PDF.">
+                            <field name="valoracion_ia_openai_api_key"
+                                   password="True"/>
+                        </setting>
+                        <setting id="ia_endpoint_openai"
+                                 string="Endpoint OpenAI"
+                                 help="URL del endpoint de OpenAI Chat Completions API.">
+                            <field name="valoracion_ia_openai_endpoint_url"
+                                   placeholder="https://api.openai.com/v1/chat/completions"/>
+                        </setting>
+                    </block>
+
+                    <block title="Parámetros del modelo" name="ia_parametros">
+                        <setting id="ia_temperatura"
+                                 string="Temperatura"
+                                 help="0.0 = determinista; 1.0 = creativo. Para valoraciones funcionales, 0.2-0.4 mantiene consistencia.">
+                            <field name="valoracion_ia_temperatura"/>
+                        </setting>
+                        <setting id="ia_max_tokens"
+                                 string="Máximo de tokens (output)"
+                                 help="Máximo de tokens que la IA puede generar en su respuesta.">
+                            <field name="valoracion_ia_max_tokens"/>
+                        </setting>
+                        <setting id="ia_timeout_seconds"
+                                 string="Timeout (segundos)"
+                                 help="Tiempo máximo de espera por respuesta IA. Si se excede, se cancela.">
+                            <field name="valoracion_ia_timeout_seconds"/>
+                        </setting>
+                    </block>
+
+                    <block title="Límites de tamaño y tokens" name="ia_limites">
+                        <setting id="ia_max_archivo_mb"
+                                 string="Máximo por archivo (MB)"
+                                 help="Tamaño máximo permitido por archivo de cliente.">
+                            <field name="valoracion_ia_max_archivo_mb"/>
+                        </setting>
+                        <setting id="ia_max_total_mb"
+                                 string="Máximo total por valoración (MB)"
+                                 help="Suma máxima de archivos en una valoración.">
+                            <field name="valoracion_ia_max_total_mb"/>
+                        </setting>
+                        <setting id="ia_max_prompt_tokens"
+                                 string="Máximo tokens del prompt"
+                                 help="Si se excede, fuentes y archivos se truncan de forma controlada.">
+                            <field name="valoracion_ia_max_prompt_tokens"/>
+                        </setting>
+                    </block>
+
+                    <block title="Costos referenciales (USD)" name="ia_costos">
+                        <setting id="ia_costo_claude_in"
+                                 string="Claude — input por 1M tokens"
+                                 help="Costo en USD por millón de tokens de entrada para Claude.">
+                            <field name="valoracion_ia_costo_per_1m_input"/>
+                        </setting>
+                        <setting id="ia_costo_claude_out"
+                                 string="Claude — output por 1M tokens"
+                                 help="Costo en USD por millón de tokens de salida para Claude.">
+                            <field name="valoracion_ia_costo_per_1m_output"/>
+                        </setting>
+                        <setting id="ia_costo_openai_in"
+                                 string="OpenAI — input por 1M tokens"
+                                 help="Costo en USD por millón de tokens de entrada para OpenAI.">
+                            <field name="valoracion_ia_openai_costo_per_1m_input"/>
+                        </setting>
+                        <setting id="ia_costo_openai_out"
+                                 string="OpenAI — output por 1M tokens"
+                                 help="Costo en USD por millón de tokens de salida para OpenAI.">
+                            <field name="valoracion_ia_openai_costo_per_1m_output"/>
+                        </setting>
+                    </block>
+
+                    <block title="Consentimiento" name="consentimiento_block">
+                        <setting id="consentimiento_texto"
+                                 string="Texto de consentimiento por defecto"
+                                 help="Snapshot de este texto se guarda en cada valoración cuando el cliente da su consentimiento. Si lo dejas vacío, se usa el texto base interno del módulo.">
+                            <field name="valoracion_consentimiento_texto"/>
+                        </setting>
+                    </block>
+
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ACTION: abre Settings filtrado a la sección Valoración -->
+    <record id="action_valoracion_settings" model="ir.actions.act_window">
+        <field name="name">Configuración Valoración VitalHealth</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'valoracion', 'bin_size': False}</field>
+    </record>
+
+</odoo>

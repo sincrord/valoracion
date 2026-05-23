@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Estructura de menús:
+
+        🩺 Valoración (root)
+        ├── Valoraciones                  [user, super, admin]
+        ├── Contactos VitalHealth         [user, super, admin]
+        ├── Citas                         [user, super, admin]
+        └── ⚙ Configuración              [super_user, admin]
+            ├── Configuración de IA       [admin]
+            ├── Fuentes                   [super_user, admin]
+            ├── Plantillas de Prompt      [admin]
+            └── Log de IA                 [super_user, admin]
+    -->
+
+    <!-- Menú raíz -->
+    <menuitem id="menu_valoracion_root"
+              name="Valoración"
+              sequence="50"
+              web_icon="valoracion,static/description/icon.png"
+              groups="valoracion.group_valoracion_user"/>
+
+    <!-- Submenús principales -->
+    <menuitem id="menu_valoracion_valoraciones"
+              parent="menu_valoracion_root"
+              name="Valoraciones"
+              action="action_valoracion_valoracion"
+              sequence="10"
+              groups="valoracion.group_valoracion_user"/>
+
+    <menuitem id="menu_valoracion_contactos"
+              parent="menu_valoracion_root"
+              name="Contactos VitalHealth"
+              action="action_contactos_vitalhealth"
+              sequence="20"
+              groups="valoracion.group_valoracion_user"/>
+
+    <menuitem id="menu_valoracion_citas"
+              parent="menu_valoracion_root"
+              name="Citas"
+              action="action_valoracion_citas"
+              sequence="30"
+              groups="valoracion.group_valoracion_user"/>
+
+    <!-- Submenú: Configuración (solo Super Usuario y Admin) -->
+    <menuitem id="menu_valoracion_config"
+              parent="menu_valoracion_root"
+              name="Configuración"
+              sequence="100"
+              groups="valoracion.group_valoracion_super_user"/>
+
+    <menuitem id="menu_valoracion_config_ia"
+              parent="menu_valoracion_config"
+              name="Configuración de IA"
+              action="action_valoracion_settings"
+              sequence="10"
+              groups="valoracion.group_valoracion_admin"/>
+
+
+    <menuitem id="menu_valoracion_fuentes"
+              parent="menu_valoracion_config"
+              name="Fuentes"
+              action="action_valoracion_fuente"
+              sequence="20"
+              groups="valoracion.group_valoracion_super_user"/>
+
+    <menuitem id="menu_valoracion_producto_regla"
+              parent="menu_valoracion_config"
+              name="Reglas de Productos VitalHealth"
+              action="action_valoracion_producto_regla"
+              sequence="25"
+              groups="valoracion.group_valoracion_super_user"/>
+
+    <menuitem id="menu_valoracion_prompts"
+              parent="menu_valoracion_config"
+              name="Plantillas de Prompt"
+              action="action_valoracion_prompt_template"
+              sequence="30"
+              groups="valoracion.group_valoracion_admin"/>
+
+    <menuitem id="menu_valoracion_logs"
+              parent="menu_valoracion_config"
+              name="Log de IA"
+              action="action_valoracion_log_ia"
+              sequence="40"
+              groups="valoracion.group_valoracion_super_user"/>
+
+    <!-- Submenú: BioCuántico (Admin) — Fase 2.1 -->
+    <menuitem id="menu_valoracion_biocuantico"
+              parent="menu_valoracion_config"
+              name="BioCuántico"
+              sequence="50"
+              groups="valoracion.group_valoracion_admin"/>
+
+    <menuitem id="menu_valoracion_biocuantico_sistemas"
+              parent="menu_valoracion_biocuantico"
+              name="Sistemas Corporales"
+              action="action_biocuantico_sistema"
+              sequence="10"
+              groups="valoracion.group_valoracion_admin"/>
+
+    <menuitem id="menu_valoracion_biocuantico_estados"
+              parent="menu_valoracion_biocuantico"
+              name="Mapeo de Estados"
+              action="action_biocuantico_estado_mapeo"
+              sequence="20"
+              groups="valoracion.group_valoracion_admin"/>
+
+</odoo>

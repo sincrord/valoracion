@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_valoracion_prompt_template_list" model="ir.ui.view">
+        <field name="name">valoracion.prompt.template.list</field>
+        <field name="model">valoracion.prompt.template</field>
+        <field name="arch" type="xml">
+            <list string="Plantillas de Prompt"
+                  decoration-bf="is_default"
+                  decoration-muted="not active">
+                <field name="name"/>
+                <field name="version"/>
+                <field name="is_default" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_valoracion_prompt_template_form" model="ir.ui.view">
+        <field name="name">valoracion.prompt.template.form</field>
+        <field name="model">valoracion.prompt.template</field>
+        <field name="arch" type="xml">
+            <form string="Plantilla de Prompt">
+                <header>
+                    <button name="action_marcar_default"
+                            string="Marcar como por defecto"
+                            type="object"
+                            class="btn-primary"
+                            invisible="is_default or not active"/>
+                    <button name="action_restaurar_v4_oficial"
+                            string="Restaurar wording oficial v4.1"
+                            type="object"
+                            class="btn-secondary"
+                            confirm="Esto sobreescribirá system_prompt, user_prompt_template y output_schema con el wording oficial v4.1 (FUENTE PRINCIPAL reforzada + mínimos exigibles). Se preservan name, is_default, active y notes. ¿Continuar?"
+                            help="Re-aplica el wording oficial v4.1 sobre esta plantilla. Útil cuando la plantilla activa en BD quedó con texto viejo (ej. 'referencia complementaria') por haber sido editada manualmente antes de la actualización del módulo."/>
+                    <button name="action_aplicar_prompt_v5"
+                            string="Aplicar Prompt v5"
+                            type="object"
+                            class="btn-secondary"
+                            confirm="Esto sobreescribirá system_prompt, user_prompt_template y output_schema con el Prompt v5 (más humano, programas funcionales, mismas restricciones legales). Se preservan name, is_default, active y notes. Rollback disponible con 'Restaurar v4.1 oficial'. ¿Continuar?"
+                            help="Aplica el Prompt v5: tono más humano y wellness, programas funcionales (campo opcional nuevo), mismas restricciones legales que v4.1. Los parsers existentes siguen funcionando porque programas_funcionales no es required."/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon"
+                            title="Por defecto"
+                            bg_color="text-bg-success"
+                            invisible="not is_default"/>
+                    <widget name="web_ribbon"
+                            title="Archivada"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Nombre"/>
+                        <h1><field name="name"
+                                   placeholder="Ej: Plantilla VitalHealth v2"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="version"/>
+                            <field name="is_default"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>⚠ Atención:</strong> modificar esta plantilla
+                        afecta directamente la calidad y consistencia de las
+                        valoraciones generadas. Prueba siempre con un caso
+                        conocido antes de poner en producción.
+                    </div>
+                    <notebook>
+                        <page string="Prompt de sistema" name="system">
+                            <field name="system_prompt"
+                                   nolabel="1"
+                                   widget="text"/>
+                            <div class="text-muted mt-2">
+                                Define rol, reglas y restricciones que la IA
+                                debe cumplir en cada respuesta.
+                            </div>
+                        </page>
+                        <page string="Plantilla de prompt de usuario" name="user">
+                            <field name="user_prompt_template"
+                                   nolabel="1"
+                                   widget="text"/>
+                            <div class="text-muted mt-2">
+                                Placeholders soportados:
+                                <code>{{DATOS_CONTACTO}}</code>,
+                                <code>{{ANTECEDENTE_CLINICO}}</code>,
+                                <code>{{CONTENIDO_ARCHIVOS_CLIENTE}}</code>,
+                                <code>{{FUENTES_DEL_MODULO}}</code>.
+                            </div>
+                        </page>
+                        <page string="Schema JSON de salida" name="schema">
+                            <field name="output_schema"
+                                   nolabel="1"
+                                   widget="text"/>
+                            <div class="text-muted mt-2">
+                                JSON Schema que la IA debe cumplir. Se usa
+                                para forzar la respuesta vía tool_use.
+                            </div>
+                        </page>
+                        <page string="Notas" name="notas">
+                            <field name="notes" nolabel="1"
+                                   placeholder="Notas internas, changelog, contexto..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_valoracion_prompt_template" model="ir.actions.act_window">
+        <field name="name">Plantillas de Prompt</field>
+        <field name="res_model">valoracion.prompt.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Plantillas de prompt para la IA
+            </p>
+            <p>
+                Define las instrucciones que se envían a Claude al generar
+                valoraciones. Solo el Administrador puede crear o modificar
+                plantillas.
+            </p>
+        </field>
+    </record>
+
+</odoo>

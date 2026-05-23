@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- INHERIT FORM: añade el campo valoracion_id -->
+    <record id="view_calendar_event_form_inherit_valoracion" model="ir.ui.view">
+        <field name="name">calendar.event.form.inherit.valoracion</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button hacia la valoración asociada -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button"
+                        type="object"
+                        name="action_view_valoracion"
+                        icon="fa-stethoscope"
+                        invisible="not valoracion_id"
+                        groups="valoracion.group_valoracion_user">
+                    <span>Valoración</span>
+                </button>
+            </xpath>
+
+            <!-- Campo valoracion_id en el sheet, debajo del partner_ids -->
+            <xpath expr="//field[@name='partner_ids']" position="after">
+                <field name="valoracion_id"
+                       options="{'no_create': True}"
+                       groups="valoracion.group_valoracion_user"
+                       invisible="not valoracion_id"
+                       readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- INHERIT LIST: añade columna valoracion_id (opcional) -->
+    <record id="view_calendar_event_list_inherit_valoracion" model="ir.ui.view">
+        <field name="name">calendar.event.list.inherit.valoracion</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="valoracion_id"
+                       optional="hide"
+                       groups="valoracion.group_valoracion_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- INHERIT SEARCH: añade filtro "Solo de Valoración" -->
+    <record id="view_calendar_event_search_inherit_valoracion" model="ir.ui.view">
+        <field name="name">calendar.event.search.inherit.valoracion</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Citas de Valoración VitalHealth"
+                        name="filter_valoracion"
+                        domain="[('valoracion_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ACTION para el menú "Citas" -->
+    <record id="action_valoracion_citas" model="ir.actions.act_window">
+        <field name="name">Citas VitalHealth</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="context">{'search_default_filter_valoracion': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay citas registradas
+            </p>
+            <p>
+                Aquí ves las citas de calendario ligadas a valoraciones
+                VitalHealth. Para crear una cita, abre una valoración y usa
+                el botón "Nueva cita".
+            </p>
+        </field>
+    </record>
+
+</odoo>

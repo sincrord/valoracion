@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Vistas para valoracion.linea.producto.
+
+        Diseño UX (vista tipo propuesta comercial, no técnica):
+          * List visible: Producto | Dosis | Cantidad | Precio | Subtotal | Razón
+          * Campos técnicos (product_name_ia, match_status, regla_producto_id,
+            cantidad_calculada_por_regla, duracion_paquete_dias) NO se muestran
+            en la list. Quedan en el form bajo "Auditoría técnica" con groups,
+            visible solo para Super Usuario.
+    -->
+
+    <!-- LIST VIEW (uso embebido y standalone) -->
+    <record id="view_valoracion_linea_producto_list" model="ir.ui.view">
+        <field name="name">valoracion.linea.producto.list</field>
+        <field name="model">valoracion.linea.producto</field>
+        <field name="arch" type="xml">
+            <list string="Productos VitalHealth Recomendados"
+                  editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="product_id"
+                       options="{'no_create': True}"/>
+                <field name="dosis_sugerida"
+                       string="Dosis"
+                       optional="show"/>
+                <field name="cantidad"/>
+                <field name="precio_unitario" widget="monetary"/>
+                <field name="subtotal" widget="monetary"/>
+                <field name="razon" optional="show"/>
+                <!-- Técnicos: invisibles en list, accesibles en form -->
+                <field name="currency_id" column_invisible="1"/>
+                <field name="product_name_ia" column_invisible="1"/>
+                <field name="match_status" column_invisible="1"/>
+                <field name="regla_producto_id" column_invisible="1"/>
+                <field name="cantidad_calculada_por_regla" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW: tipo propuesta, dosis bajo el producto, técnicos en notebook con groups -->
+    <record id="view_valoracion_linea_producto_form" model="ir.ui.view">
+        <field name="name">valoracion.linea.producto.form</field>
+        <field name="model">valoracion.linea.producto</field>
+        <field name="arch" type="xml">
+            <form string="Línea de Producto VitalHealth">
+                <sheet>
+                    <!--
+                        Encabezado: producto en h1 + dosis como subtítulo gris.
+                        Visualmente queda:
+                            V-ITADOL
+                            2 cápsulas cada 12 horas
+                    -->
+                    <div class="oe_title">
+                        <label for="product_id" string="Producto"/>
+                        <h1>
+                            <field name="product_id"
+                                   options="{'no_create': True}"
+                                   placeholder="Selecciona un producto VitalHealth..."/>
+                        </h1>
+                        <h4 style="color: #666; font-weight: normal; margin-top: 4px;">
+                            <field name="dosis_sugerida"
+                                   nolabel="1"
+                                   placeholder="Dosis sugerida (ej: 2 cápsulas cada 12 horas)"/>
+                        </h4>
+                    </div>
+
+                    <group>
+                        <group string="Cotización mensual (30 días)">
+                            <field name="cantidad"/>
+                            <field name="precio_unitario" widget="monetary"/>
+                            <field name="subtotal" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Plan">
+                            <field name="valoracion_id"
+                                   readonly="1"
+                                   options="{'no_open': False}"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+
+                    <group string="Razón de la recomendación">
+                        <field name="razon" nolabel="1"
+                               placeholder="Justificación funcional para incluir este producto en el plan..."/>
+                    </group>
+
+                    <!--
+                        Auditoría técnica: solo Super Usuario y Administrador.
+                        Los usuarios regulares NO ven esta pestaña.
+                        Los campos siguen existiendo y se llenan automáticamente
+                        al procesar la respuesta de la IA.
+                    -->
+                    <notebook groups="valoracion.group_valoracion_super_user">
+                        <page string="Auditoría técnica" name="auditoria">
+                            <group>
+                                <group string="Origen IA">
+                                    <field name="product_name_ia" readonly="1"/>
+                                    <field name="match_status"
+                                           widget="badge"
+                                           readonly="1"
+                                           decoration-success="match_status == 'exacto'"
+                                           decoration-info="match_status in ('aproximado', 'manual')"
+                                           decoration-danger="match_status == 'no_encontrado'"/>
+                                </group>
+                                <group string="Regla aplicada">
+                                    <field name="regla_producto_id"
+                                           readonly="1"
+                                           options="{'no_create': True}"/>
+                                    <field name="duracion_paquete_dias" readonly="1"/>
+                                    <field name="cantidad_calculada_por_regla"
+                                           readonly="1"
+                                           widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Inherit del form view de product.template para exponer
+        is_vitalhealth y is_vitalhealth_effective.
+
+        Decisiones aplicadas (corrección del bug "no aparece"):
+
+        1) inherit_id apunta a `product.product_template_only_form_view`
+           (no a product_template_form_view). En Odoo 18 Community, el form
+           que el usuario ve al abrir un producto desde el menú Productos
+           es product_template_only_form_view (primary inherit con priority=9).
+           Inyectar aquí garantiza visibilidad.
+
+        2) XPath simple sobre `//field[@name='categ_id']` en lugar de
+           `//page[@name='general_information']`. El campo categ_id es
+           estable entre versiones; el name de la pestaña podría variar.
+
+        3) SIN atributo `groups`. Cualquier usuario que pueda abrir un
+           producto verá los campos. Si después se quiere restringir, añadir
+           `groups="valoracion.group_valoracion_super_user"` en cada field.
+    -->
+    <record id="view_product_template_form_valoracion" model="ir.ui.view">
+        <field name="name">product.template.form.valoracion</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="is_vitalhealth"/>
+                <!--
+                    is_vitalhealth_effective NO se muestra en la UI por
+                    decisión de UX. El campo Python sigue existiendo y se
+                    sigue usando internamente para:
+                      * domain del Many2one en valoracion.linea.producto
+                      * matching del catálogo en valoracion.valoracion
+                      * filtros de búsqueda
+                    Solo se ocultó la visualización en el form del producto.
+                -->
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Inherit del list view: columna opcional is_vitalhealth.
+        SIN groups para que aparezca visible para todos los admins/usuarios
+        durante la prueba inicial.
+    -->
+    <record id="view_product_template_list_valoracion" model="ir.ui.view">
+        <field name="name">product.template.list.valoracion</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="is_vitalhealth" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Inherit del search view: filtro "Productos VitalHealth".
+        SIN groups.
+    -->
+    <record id="view_product_template_search_valoracion" model="ir.ui.view">
+        <field name="name">product.template.search.valoracion</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Productos VitalHealth"
+                        name="filter_is_vitalhealth_effective"
+                        domain="[('is_vitalhealth_effective', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

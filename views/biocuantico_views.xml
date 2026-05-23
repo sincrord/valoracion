@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =========================================================
+         Sistemas BioCuánticos
+         ========================================================= -->
+
+    <record id="view_biocuantico_sistema_list" model="ir.ui.view">
+        <field name="name">valoracion.biocuantico.sistema.list</field>
+        <field name="model">valoracion.biocuantico.sistema</field>
+        <field name="arch" type="xml">
+            <list string="Sistemas BioCuánticos"
+                  decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="keywords" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_biocuantico_sistema_form" model="ir.ui.view">
+        <field name="name">valoracion.biocuantico.sistema.form</field>
+        <field name="model">valoracion.biocuantico.sistema</field>
+        <field name="arch" type="xml">
+            <form string="Sistema BioCuántico">
+                <sheet>
+                    <widget name="web_ribbon"
+                            title="Archivado"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Nombre"/>
+                        <h1><field name="name" placeholder="Ej: Sistema Cardiovascular"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="ej: cardiovascular"/>
+                            <field name="sequence"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </group>
+                    <group string="Descripción">
+                        <field name="description" nolabel="1"
+                               placeholder="Descripción funcional del sistema (uso interno)."/>
+                    </group>
+                    <group string="Palabras clave (usadas por el parser en Fase 2.2)">
+                        <field name="keywords" nolabel="1"
+                               placeholder="Una palabra por línea o separadas por coma. Ej: cardiovascular, corazón, presión arterial..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_biocuantico_sistema_search" model="ir.ui.view">
+        <field name="name">valoracion.biocuantico.sistema.search</field>
+        <field name="model">valoracion.biocuantico.sistema</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="keywords"/>
+                <filter string="Activos" name="filter_activos"
+                        domain="[('active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_biocuantico_sistema" model="ir.actions.act_window">
+        <field name="name">Sistemas BioCuánticos</field>
+        <field name="res_model">valoracion.biocuantico.sistema</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_biocuantico_sistema_search"/>
+        <field name="context">{'search_default_filter_activos': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer sistema BioCuántico
+            </p>
+            <p>
+                Los sistemas BioCuánticos son los ejes fisiológicos que el parser
+                (Fase 2.2) usará para agrupar mediciones de los reportes.
+            </p>
+        </field>
+    </record>
+
+    <!-- =========================================================
+         Mapeo de estados BioCuánticos
+         ========================================================= -->
+
+    <record id="view_biocuantico_estado_mapeo_list" model="ir.ui.view">
+        <field name="name">valoracion.biocuantico.estado.mapeo.list</field>
+        <field name="model">valoracion.biocuantico.estado.mapeo</field>
+        <field name="arch" type="xml">
+            <list string="Mapeo de Estados BioCuánticos"
+                  decoration-muted="not active"
+                  decoration-success="normalized in ('optimo','normal')"
+                  decoration-warning="normalized in ('leve','moderado')"
+                  decoration-danger="normalized in ('severo','critico')">
+                <field name="raw_label"/>
+                <field name="normalized"/>
+                <field name="severity"/>
+                <field name="sistema_id" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_biocuantico_estado_mapeo_form" model="ir.ui.view">
+        <field name="name">valoracion.biocuantico.estado.mapeo.form</field>
+        <field name="model">valoracion.biocuantico.estado.mapeo</field>
+        <field name="arch" type="xml">
+            <form string="Mapeo de Estado BioCuántico">
+                <sheet>
+                    <widget name="web_ribbon"
+                            title="Archivado"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="raw_label"
+                                   placeholder="Ej: Levemente alterado"/>
+                            <field name="normalized"/>
+                            <field name="severity" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="sistema_id"
+                                   options="{'no_create': True}"
+                                   placeholder="Vacío = aplica globalmente"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group string="Notas">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Si <b>Sistema corporal</b> se deja vacío, el mapeo se aplica
+                        a cualquier sistema. Si se asigna a un sistema específico,
+                        el parser (Fase 2.2) lo preferirá sobre el mapeo global
+                        para esa misma etiqueta.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_biocuantico_estado_mapeo_search" model="ir.ui.view">
+        <field name="name">valoracion.biocuantico.estado.mapeo.search</field>
+        <field name="model">valoracion.biocuantico.estado.mapeo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="raw_label"/>
+                <field name="sistema_id"/>
+                <filter string="Activos" name="filter_activos"
+                        domain="[('active', '=', True)]"/>
+                <separator/>
+                <filter string="Óptimo / Normal" name="filter_ok"
+                        domain="[('normalized', 'in', ['optimo','normal'])]"/>
+                <filter string="Leve / Moderado" name="filter_medio"
+                        domain="[('normalized', 'in', ['leve','moderado'])]"/>
+                <filter string="Severo / Crítico" name="filter_alto"
+                        domain="[('normalized', 'in', ['severo','critico'])]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado normalizado"
+                            name="groupby_normalized"
+                            context="{'group_by': 'normalized'}"/>
+                    <filter string="Sistema corporal"
+                            name="groupby_sistema"
+                            context="{'group_by': 'sistema_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_biocuantico_estado_mapeo" model="ir.actions.act_window">
+        <field name="name">Mapeo de Estados BioCuánticos</field>
+        <field name="res_model">valoracion.biocuantico.estado.mapeo</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_biocuantico_estado_mapeo_search"/>
+        <field name="context">{'search_default_filter_activos': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Agrega tu primer mapeo de estado
+            </p>
+            <p>
+                Los reportes BioCuánticos usan etiquetas distintas para indicar
+                niveles ("Normal", "Levemente alterado", "Crítico"...). Mapea
+                cada variante a uno de los estados normalizados internos para
+                que el resumen maestro (Fase 2.2) sea consistente.
+            </p>
+        </field>
+    </record>
+
+</odoo>

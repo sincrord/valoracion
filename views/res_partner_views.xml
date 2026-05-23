@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         INHERIT GLOBAL: añade Antecedente Clínico + smart buttons al
+         res.partner. Esta es la herencia "no agresiva" (decisión 3):
+           - Solo agrega cosas, NO oculta campos.
+           - Los smart buttons solo aparecen para usuarios del módulo
+             gracias al atributo 'groups'.
+           - El tab "Antecedente Clínico" se inserta como primera pestaña
+             del notebook (a la izquierda de "Contactos y direcciones").
+         ================================================================ -->
+    <record id="view_partner_form_inherit_valoracion" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.valoracion</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Smart buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button"
+                        type="object"
+                        name="action_view_valoraciones"
+                        icon="fa-stethoscope"
+                        groups="valoracion.group_valoracion_user">
+                    <field name="valoracion_count"
+                           string="Valoraciones"
+                           widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button"
+                        type="object"
+                        name="action_view_valoracion_citas"
+                        icon="fa-calendar"
+                        groups="valoracion.group_valoracion_user">
+                    <field name="valoracion_cita_count"
+                           string="Citas"
+                           widget="statinfo"/>
+                </button>
+            </xpath>
+
+            <!-- Antecedente Clínico tab — primera del notebook -->
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Antecedente Clínico"
+                      name="vitalhealth_antecedente"
+                      groups="valoracion.group_valoracion_user">
+                    <group>
+                        <group string="Datos demográficos">
+                            <field name="birthdate"/>
+                            <field name="age" readonly="1"/>
+                            <field name="sexo"/>
+                            <field name="estatura_cm"/>
+                            <field name="peso_kg"/>
+                        </group>
+                        <group string="Plan VitalHealth">
+                            <field name="objetivo_principal"/>
+                            <field name="antecedente_completo"
+                                   readonly="1"
+                                   widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group string="Antecedente">
+                        <field name="antecedente_medicamentos"
+                               nolabel="0"
+                               placeholder="Indica medicamentos actuales y dosis (o 'ninguno')."/>
+                        <field name="antecedente_padecimientos"
+                               nolabel="0"
+                               placeholder="Padecimientos diagnosticados (o 'ninguno')."/>
+                        <field name="antecedente_suplementos"
+                               nolabel="0"
+                               placeholder="Suplementos actuales (o 'ninguno')."/>
+                        <field name="antecedente_alergias"
+                               nolabel="0"
+                               placeholder="Alergias o restricciones (o 'ninguna')."/>
+                    </group>
+                    <div class="text-muted">
+                        Estos datos son consultados por la IA al generar
+                        valoraciones. No constituyen diagnóstico médico.
+                    </div>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ================================================================
+         VISTA AISLADA: "Contactos VitalHealth"
+         Vista primary que extiende la base ocultando función, teléfono,
+         sitio web y título (decisión 3 — sin afectar la vista global).
+         ================================================================ -->
+    <record id="view_partner_form_vitalhealth" model="ir.ui.view">
+        <field name="name">res.partner.form.vitalhealth</field>
+        <field name="model">res.partner</field>
+        <field name="mode">primary</field>
+        <field name="priority">100</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='function']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='website']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='title']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ================================================================
+         ACTION: "Contactos VitalHealth"
+         ================================================================ -->
+    <record id="action_contactos_vitalhealth" model="ir.actions.act_window">
+        <field name="name">Contactos VitalHealth</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban'}),
+            (0, 0, {'view_mode': 'list'}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_partner_form_vitalhealth')}),
+        ]"/>
+        <field name="context">{'res_partner_search_mode': 'customer'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer contacto VitalHealth
+            </p>
+            <p>
+                Esta vista oculta campos no relevantes para el flujo VitalHealth
+                (puesto, teléfono fijo, sitio web, título). El campo "Celular"
+                permanece visible. La pestaña "Antecedente Clínico" está
+                disponible una vez que abras un contacto.
+            </p>
+        </field>
+    </record>
+
+</odoo>

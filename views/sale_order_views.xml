@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- INHERIT FORM: smart button + campo valoracion_id -->
+    <record id="view_sale_order_form_inherit_valoracion" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.valoracion</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button hacia la valoración -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button"
+                        type="object"
+                        name="action_view_valoracion"
+                        icon="fa-stethoscope"
+                        invisible="not valoracion_id"
+                        groups="valoracion.group_valoracion_user">
+                    <span>Valoración</span>
+                </button>
+            </xpath>
+
+            <!-- Campo valoracion_id en el grupo de cabecera -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="valoracion_id"
+                       options="{'no_create': True}"
+                       invisible="not valoracion_id"
+                       readonly="1"
+                       groups="valoracion.group_valoracion_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- INHERIT LIST: columna opcional valoracion_id -->
+    <record id="view_sale_order_list_inherit_valoracion" model="ir.ui.view">
+        <field name="name">sale.order.list.inherit.valoracion</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="valoracion_id"
+                       optional="hide"
+                       groups="valoracion.group_valoracion_user"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

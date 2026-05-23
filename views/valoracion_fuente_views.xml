@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_valoracion_fuente_list" model="ir.ui.view">
+        <field name="name">valoracion.fuente.list</field>
+        <field name="model">valoracion.fuente</field>
+        <field name="arch" type="xml">
+            <list string="Fuentes VitalHealth"
+                  decoration-muted="not active"
+                  decoration-warning="extraction_status == 'pendiente'"
+                  decoration-danger="extraction_status == 'error'">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="tipo" widget="badge"/>
+                <field name="file_count"/>
+                <field name="total_size_human"/>
+                <field name="extraction_status" widget="badge"
+                       decoration-success="extraction_status == 'ok'"
+                       decoration-warning="extraction_status == 'pendiente'"
+                       decoration-danger="extraction_status == 'error'"/>
+                <field name="extracted_at" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_valoracion_fuente_form" model="ir.ui.view">
+        <field name="name">valoracion.fuente.form</field>
+        <field name="model">valoracion.fuente</field>
+        <field name="arch" type="xml">
+            <form string="Fuente VitalHealth">
+                <header>
+                    <button name="action_reextraer"
+                            string="Re-extraer texto"
+                            type="object"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon"
+                            title="Archivada"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Nombre"/>
+                        <h1><field name="name" placeholder="Ej: Catálogo VitalHealth Q4 2026"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="tipo"/>
+                            <field name="sequence"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Estado de extracción">
+                            <field name="extraction_status" widget="badge"/>
+                            <field name="extracted_at" readonly="1"/>
+                            <field name="file_count" readonly="1"/>
+                            <field name="total_size_human" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Descripción">
+                        <field name="description" nolabel="1"
+                               placeholder="Describe el contenido y propósito de esta fuente."/>
+                    </group>
+                    <notebook>
+                        <page string="Archivos" name="archivos">
+                            <field name="attachment_ids"
+                                   widget="many2many_binary"/>
+                            <div class="text-muted mt-2">
+                                Tipos soportados: PDF, XLS, XLSX, CSV, TXT.
+                                Las imágenes en fuentes se ignoran (solo aplican
+                                a archivos de cliente).
+                            </div>
+                        </page>
+                        <page string="Texto extraído (cache)" name="cache"
+                              invisible="not extracted_text">
+                            <field name="extracted_text"
+                                   readonly="1"
+                                   nolabel="1"/>
+                        </page>
+                        <page string="Errores de extracción" name="errores"
+                              invisible="not extraction_error">
+                            <field name="extraction_error"
+                                   readonly="1"
+                                   nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_valoracion_fuente_search" model="ir.ui.view">
+        <field name="name">valoracion.fuente.search</field>
+        <field name="model">valoracion.fuente</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Fuentes">
+                <field name="name"/>
+                <field name="tipo"/>
+                <filter string="Activas" name="filter_activas"
+                        domain="[('active', '=', True)]"/>
+                <filter string="Archivadas" name="filter_archivadas"
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Catálogo" name="filter_catalogo"
+                        domain="[('tipo', '=', 'catalogo')]"/>
+                <filter string="Fichas técnicas" name="filter_fichas"
+                        domain="[('tipo', '=', 'fichas_tecnicas')]"/>
+                <filter string="Lista de precios" name="filter_precios"
+                        domain="[('tipo', '=', 'lista_precios')]"/>
+                <separator/>
+                <filter string="Con error de extracción"
+                        name="filter_error"
+                        domain="[('extraction_status', '=', 'error')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Tipo" name="groupby_tipo"
+                            context="{'group_by': 'tipo'}"/>
+                    <filter string="Estado de extracción" name="groupby_extraction"
+                            context="{'group_by': 'extraction_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_valoracion_fuente" model="ir.actions.act_window">
+        <field name="name">Fuentes</field>
+        <field name="res_model">valoracion.fuente</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_valoracion_fuente_search"/>
+        <field name="context">{'search_default_filter_activas': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Agrega tu primera fuente VitalHealth
+            </p>
+            <p>
+                Las fuentes contienen los documentos autorizados (catálogo, fichas
+                técnicas, lista de precios) que la IA consulta al generar valoraciones.
+                Sin al menos una fuente activa, las generaciones se bloquean.
+            </p>
+        </field>
+    </record>
+
+</odoo>

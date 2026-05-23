@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_valoracion_producto_regla_list" model="ir.ui.view">
+        <field name="name">valoracion.producto.regla.list</field>
+        <field name="model">valoracion.producto.regla</field>
+        <field name="arch" type="xml">
+            <list string="Reglas de Productos VitalHealth"
+                  decoration-muted="not active">
+                <field name="prioridad" widget="handle"/>
+                <field name="product_id"/>
+                <field name="duracion_paquete_dias"/>
+                <field name="usar_cantidad_manual" widget="boolean_toggle"/>
+                <field name="cantidad_mensual_manual" optional="hide"/>
+                <field name="cantidad_mensual"/>
+                <field name="dosis_sugerida" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_valoracion_producto_regla_form" model="ir.ui.view">
+        <field name="name">valoracion.producto.regla.form</field>
+        <field name="model">valoracion.producto.regla</field>
+        <field name="arch" type="xml">
+            <form string="Regla de Producto VitalHealth">
+                <sheet>
+                    <widget name="web_ribbon"
+                            title="Archivada"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="product_id" string="Producto"/>
+                        <h1>
+                            <field name="product_id"
+                                   options="{'no_create': True}"
+                                   placeholder="Selecciona un producto VitalHealth..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Cantidad mensual">
+                            <field name="duracion_paquete_dias"/>
+                            <field name="usar_cantidad_manual"
+                                   widget="boolean_toggle"/>
+                            <field name="cantidad_mensual_manual"
+                                   invisible="not usar_cantidad_manual"/>
+                            <field name="cantidad_mensual"
+                                   readonly="1"
+                                   help="Calculada automáticamente: ceil(30 / duración del paquete) si no se usa cantidad manual."/>
+                        </group>
+                        <group string="Estado">
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="prioridad"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"
+                                   options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Dosis sugerida y observaciones"
+                              name="dosis">
+                            <group>
+                                <field name="dosis_sugerida"
+                                       nolabel="0"
+                                       placeholder="Ej: 2 cápsulas cada 12 horas durante el primer mes."/>
+                            </group>
+                            <group string="Observaciones internas">
+                                <field name="observaciones"
+                                       nolabel="1"
+                                       placeholder="Notas internas (no aparecen en el PDF)."/>
+                            </group>
+                        </page>
+                    </notebook>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Recordatorio:</strong> la <code>cantidad mensual</code>
+                        representa <b>paquetes a comprar</b> para un programa de
+                        <b>30 días</b>, no la dosis diaria. La dosis es
+                        informativa y va en el campo correspondiente.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_valoracion_producto_regla_search" model="ir.ui.view">
+        <field name="name">valoracion.producto.regla.search</field>
+        <field name="model">valoracion.producto.regla</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Reglas">
+                <field name="product_id"/>
+                <field name="dosis_sugerida"/>
+                <filter string="Activas" name="filter_activas"
+                        domain="[('active', '=', True)]"/>
+                <filter string="Con cantidad manual"
+                        name="filter_manual"
+                        domain="[('usar_cantidad_manual', '=', True)]"/>
+                <separator/>
+                <filter string="Mensual (30d)" name="filter_30d"
+                        domain="[('duracion_paquete_dias', '=', 30)]"/>
+                <filter string="Quincenal (15d)" name="filter_15d"
+                        domain="[('duracion_paquete_dias', '=', 15)]"/>
+                <filter string="Semanal (7d)" name="filter_7d"
+                        domain="[('duracion_paquete_dias', '=', 7)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Producto" name="groupby_product"
+                            context="{'group_by': 'product_id'}"/>
+                    <filter string="Duración paquete" name="groupby_duracion"
+                            context="{'group_by': 'duracion_paquete_dias'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_valoracion_producto_regla"
+            model="ir.actions.act_window">
+        <field name="name">Reglas de Productos VitalHealth</field>
+        <field name="res_model">valoracion.producto.regla</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_valoracion_producto_regla_search"/>
+        <field name="context">{'search_default_filter_activas': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primera regla de producto
+            </p>
+            <p>
+                Una regla define cuántos paquetes de un producto se necesitan
+                para cubrir un mes de tratamiento. Ejemplo:
+            </p>
+            <ul>
+                <li><b>VITAL PRO</b> con duración 15 días → 2 paquetes/mes</li>
+                <li><b>V-TE DETOX</b> con duración 7 días → 4 paquetes/mes</li>
+                <li><b>V-ITADOL</b> con duración 30 días → 1 paquete/mes</li>
+            </ul>
+            <p>
+                Si un producto no tiene regla, el sistema asume 1 paquete/mes.
+            </p>
+        </field>
+    </record>
+
+</odoo>

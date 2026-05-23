@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Vistas para valoracion.archivo.cliente.
+        Uso principal: O2M editable dentro del form de valoracion.valoracion.
+        El form standalone se incluye por si se accede vía link/breadcrumb.
+    -->
+
+    <!-- LIST VIEW (uso principalmente embebido) -->
+    <record id="view_valoracion_archivo_cliente_list" model="ir.ui.view">
+        <field name="name">valoracion.archivo.cliente.list</field>
+        <field name="model">valoracion.archivo.cliente</field>
+        <field name="arch" type="xml">
+            <list string="Archivos del Cliente" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="file_data" filename="file_name" widget="binary"/>
+                <field name="file_name" column_invisible="1"/>
+                <field name="file_type" widget="badge"/>
+                <field name="file_size_human"/>
+                <field name="extraction_status" widget="badge"
+                       decoration-success="extraction_status == 'ok'"
+                       decoration-warning="extraction_status == 'pendiente'"
+                       decoration-danger="extraction_status == 'error'"/>
+                <field name="extracted_at" optional="hide"/>
+                <field name="biocuantico_parse_status"
+                       widget="badge"
+                       optional="hide"
+                       decoration-success="biocuantico_parse_status == 'ok'"
+                       decoration-info="biocuantico_parse_status in ('detected','partial')"
+                       decoration-muted="biocuantico_parse_status == 'not_parsed'"
+                       decoration-warning="biocuantico_parse_status == 'not_biocuantico'"
+                       decoration-danger="biocuantico_parse_status == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_valoracion_archivo_cliente_form" model="ir.ui.view">
+        <field name="name">valoracion.archivo.cliente.form</field>
+        <field name="model">valoracion.archivo.cliente</field>
+        <field name="arch" type="xml">
+            <form string="Archivo del Cliente">
+                <header>
+                    <button name="action_detectar_biocuantico"
+                            type="object"
+                            string="Detectar BioCuántico"
+                            class="btn-secondary"
+                            groups="valoracion.group_valoracion_admin"
+                            help="Fase 2.1: solo detecta si el archivo es un reporte BioCuántico. No ejecuta parser real ni modifica el flujo de generación IA."/>
+                    <field name="biocuantico_parse_status"
+                           widget="statusbar"
+                           statusbar_visible="not_parsed,ok,partial,not_biocuantico,failed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="valoracion_id"
+                                   readonly="1"
+                                   options="{'no_open': False}"/>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="file_type" widget="badge"/>
+                            <field name="file_size_human"/>
+                            <field name="extraction_status" widget="badge"/>
+                            <field name="extracted_at" readonly="1"/>
+                            <field name="biocuantico_detectado"
+                                   readonly="1"
+                                   groups="valoracion.group_valoracion_super_user"/>
+                            <field name="biocuantico_parsed_at"
+                                   readonly="1"
+                                   groups="valoracion.group_valoracion_super_user"/>
+                            <field name="biocuantico_motor_version"
+                                   readonly="1"
+                                   widget="badge"
+                                   groups="valoracion.group_valoracion_super_user"/>
+                            <field name="biocuantico_parser_version"
+                                   readonly="1"
+                                   groups="valoracion.group_valoracion_super_user"
+                                   invisible="not biocuantico_parser_version"/>
+                            <field name="biocuantico_fallback_used"
+                                   readonly="1"
+                                   groups="valoracion.group_valoracion_super_user"
+                                   invisible="not biocuantico_fallback_used"/>
+                        </group>
+                    </group>
+                    <group string="Archivo">
+                        <field name="file_data"
+                               filename="file_name"
+                               widget="binary"
+                               nolabel="1"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                    <group string="Texto extraído (cache)"
+                           invisible="not extracted_text">
+                        <field name="extracted_text"
+                               readonly="1"
+                               nolabel="1"/>
+                    </group>
+                    <group string="Error de extracción"
+                           invisible="not extraction_error">
+                        <field name="extraction_error"
+                               readonly="1"
+                               nolabel="1"/>
+                    </group>
+                    <group string="BioCuántico — Resumen (Fase 2.2)"
+                           groups="valoracion.group_valoracion_admin"
+                           invisible="not biocuantico_summary_text and not biocuantico_summary_json">
+                        <field name="biocuantico_summary_text"
+                               readonly="1"
+                               nolabel="1"/>
+                        <field name="biocuantico_summary_json"
+                               readonly="1"
+                               nolabel="1"
+                               invisible="not biocuantico_summary_json"/>
+                    </group>
+                    <group string="Error BioCuántico"
+                           groups="valoracion.group_valoracion_admin"
+                           invisible="not biocuantico_parse_error">
+                        <field name="biocuantico_parse_error"
+                               readonly="1"
+                               nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

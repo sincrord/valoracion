@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_valoracion_log_ia_list" model="ir.ui.view">
+        <field name="name">valoracion.log.ia.list</field>
+        <field name="model">valoracion.log.ia</field>
+        <field name="arch" type="xml">
+            <list string="Bitácora IA"
+                  create="0"
+                  decoration-success="estado == 'exito'"
+                  decoration-danger="estado in ('error_api', 'error_config')"
+                  decoration-warning="estado == 'timeout'"
+                  decoration-info="estado in ('error_parsing', 'error_validacion')">
+                <field name="create_date"/>
+                <field name="valoracion_id"/>
+                <field name="user_id"/>
+                <field name="proveedor"/>
+                <field name="modelo" optional="show"/>
+                <field name="estado" widget="badge"/>
+                <field name="tokens_input"/>
+                <field name="tokens_output"/>
+                <field name="tokens_total" optional="show"/>
+                <field name="costo_estimado" sum="Total estimado"/>
+                <field name="duracion_ms"/>
+                <field name="truncado" widget="boolean_toggle" optional="show"/>
+                <field name="error_message" optional="hide"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW (readonly) -->
+    <record id="view_valoracion_log_ia_form" model="ir.ui.view">
+        <field name="name">valoracion.log.ia.form</field>
+        <field name="model">valoracion.log.ia</field>
+        <field name="arch" type="xml">
+            <form string="Bitácora IA" create="0" edit="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h2>
+                            <field name="estado" widget="badge"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Contexto">
+                            <field name="valoracion_id"
+                                   options="{'no_open': False}"/>
+                            <field name="user_id"/>
+                            <field name="create_date"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Llamada IA">
+                            <field name="proveedor"/>
+                            <field name="modelo"/>
+                            <field name="duracion_ms"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Tokens">
+                            <field name="tokens_input"/>
+                            <field name="tokens_output"/>
+                            <field name="tokens_total"/>
+                            <field name="costo_estimado"/>
+                        </group>
+                        <group string="Tamaños">
+                            <field name="request_size_bytes"/>
+                            <field name="response_size_bytes"/>
+                            <field name="truncado"/>
+                        </group>
+                    </group>
+                    <group string="Error" invisible="not error_message">
+                        <field name="error_message"
+                               nolabel="1"
+                               readonly="1"/>
+                    </group>
+                    <group string="Detalle de truncado"
+                           invisible="not truncado_detalle">
+                        <field name="truncado_detalle"
+                               nolabel="1"
+                               readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_valoracion_log_ia_search" model="ir.ui.view">
+        <field name="name">valoracion.log.ia.search</field>
+        <field name="model">valoracion.log.ia</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Logs IA">
+                <field name="valoracion_id"/>
+                <field name="user_id"/>
+                <field name="modelo"/>
+
+                <filter string="Éxito" name="filter_exito"
+                        domain="[('estado', '=', 'exito')]"/>
+                <filter string="Errores" name="filter_errores"
+                        domain="[('estado', 'in', ['error_api', 'timeout', 'error_parsing', 'error_validacion', 'error_config'])]"/>
+                <filter string="Truncados" name="filter_truncados"
+                        domain="[('truncado', '=', True)]"/>
+                <separator/>
+                <filter string="Mías" name="filter_mias"
+                        domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Hoy" name="filter_hoy"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Este mes" name="filter_mes"
+                        domain="[('create_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado" name="groupby_estado"
+                            context="{'group_by': 'estado'}"/>
+                    <filter string="Usuario" name="groupby_user"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter string="Modelo" name="groupby_modelo"
+                            context="{'group_by': 'modelo'}"/>
+                    <filter string="Proveedor" name="groupby_proveedor"
+                            context="{'group_by': 'proveedor'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_valoracion_log_ia" model="ir.actions.act_window">
+        <field name="name">Log de IA</field>
+        <field name="res_model">valoracion.log.ia</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_valoracion_log_ia_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Bitácora vacía
+            </p>
+            <p>
+                Aquí se registran todas las llamadas a la IA con sus métricas:
+                tokens consumidos, costo estimado, duración y estado.
+                Útil para auditoría, control de costos y diagnóstico.
+            </p>
+        </field>
+    </record>
+
+</odoo>

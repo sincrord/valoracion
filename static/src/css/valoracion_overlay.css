@@ -1,0 +1,97 @@
+/* ============================================================
+   Overlay de carga durante generación IA — Valoración VitalHealth
+   ============================================================
+   Diseño Odoo 18 Community:
+     - z-index alto para superponerse a modales existentes
+     - cursor=wait
+     - blur de fondo para enfocar atención
+     - colores morado VitalHealth (#714B67) y coral suave
+   ============================================================ */
+
+.o_valoracion_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(33, 37, 41, 0.55);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: wait;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    /* Bloquea clicks que pasen al fondo */
+    pointer-events: all;
+    /* Animación de entrada */
+    animation: o_valoracion_overlay_fade_in 0.18s ease-out;
+}
+
+@keyframes o_valoracion_overlay_fade_in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.o_valoracion_overlay_inner {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+    max-width: 440px;
+    min-width: 320px;
+    cursor: default;
+}
+
+.o_valoracion_overlay_spinner {
+    margin-bottom: 18px;
+}
+
+.o_valoracion_overlay .spinner-border {
+    width: 52px;
+    height: 52px;
+    border-width: 4px;
+    color: #714B67;
+}
+
+.o_valoracion_overlay_title {
+    color: #714B67;
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.o_valoracion_overlay_msg {
+    margin: 0 0 14px 0;
+    color: #444;
+    font-size: 14px;
+    line-height: 1.4;
+    /* transición suave entre mensajes rotativos */
+    transition: opacity 0.25s ease;
+    min-height: 20px;
+}
+
+.o_valoracion_overlay_hint {
+    margin: 0;
+    color: #888;
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* Compactar en pantallas pequeñas */
+@media (max-width: 480px) {
+    .o_valoracion_overlay_inner {
+        padding: 24px 20px;
+        min-width: 0;
+        margin: 0 16px;
+    }
+    .o_valoracion_overlay .spinner-border {
+        width: 40px;
+        height: 40px;
+    }
+    .o_valoracion_overlay_title {
+        font-size: 16px;
+    }
+}
