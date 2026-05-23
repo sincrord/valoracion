@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--
+            Categoría de producto VitalHealth.
+            Los productos asignados a esta categoría deben marcarse con
+            is_vitalhealth=True. La lógica de auto-asignación se implementa
+            en models/product_template.py (ETAPA 2).
+            Solo los productos con is_vitalhealth=True son recomendables por
+            la IA y aparecen como opción en valoracion.linea.producto.
+        -->
+        <record id="product_category_vitalhealth" model="product.category">
+            <field name="name">VitalHealth</field>
+            <field name="parent_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

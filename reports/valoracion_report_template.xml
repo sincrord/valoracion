@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Template QWeb para el reporte PDF de Valoración Funcional VitalHealth.
+
+        Estructura:
+          1. Título y datos generales (folio, fecha, responsable, contacto).
+          2. Información del cliente (demográficos).
+          3. Antecedente clínico (los 4 campos del partner).
+          4. Resultados de la Valoración (HTML editable, generado por IA).
+          5. Prioridades del Caso.
+          6. Plan Estratégico (narrativa + tabla de productos VitalHealth).
+          7. Hábitos Complementarios.
+          8. Resumen Estratégico.
+          9. Resultados Esperados.
+         10. Advertencias.
+         11. Consentimiento del Cliente (snapshot inmutable).
+         12. AVISO LEGAL extendido.
+
+        NOTA SOBRE TIPOGRAFÍA:
+        Los colores principales siguen la guía visual VitalHealth:
+          * Morado Odoo: #714B67 (encabezados de sección)
+          * Coral suave: #E57373 (advertencias / aviso legal)
+          * Gris claro:  #F7F7F7 (fondos de sección)
+
+        NOTA SOBRE CONTENIDO:
+        El campo notas_internas NUNCA se incluye en el PDF (decisión
+        del modelo: notas privadas del equipo).
+    -->
+
+    <template id="report_valoracion_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+
+                    <div class="page" style="font-family: 'Roboto', sans-serif;">
+
+                        <!-- =========================================
+                             TÍTULO Y DATOS GENERALES
+                             ========================================= -->
+                        <div class="text-center mb-4">
+                            <h1 style="color: #714B67; font-weight: 600; margin-bottom: 4px;">
+                                Valoración Funcional VitalHealth
+                            </h1>
+                            <p class="text-muted" style="font-size: 12px; margin-top: 0;">
+                                Análisis complementario de bienestar
+                            </p>
+                            <hr style="border-top: 2px solid #714B67; margin-top: 8px;"/>
+                        </div>
+
+                        <table class="table table-sm table-borderless mb-4"
+                               style="font-size: 11px;">
+                            <tr>
+                                <td style="width: 50%;">
+                                    <strong>Folio:</strong>
+                                    <span style="color: #714B67;" t-field="doc.name"/>
+                                </td>
+                                <td style="width: 50%;" class="text-end">
+                                    <strong>Fecha:</strong>
+                                    <span t-field="doc.date"
+                                          t-options='{"format": "dd/MM/yyyy"}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Cliente:</strong>
+                                    <span t-field="doc.partner_id.name"/>
+                                </td>
+                                <td class="text-end">
+                                    <strong>Responsable:</strong>
+                                    <span t-field="doc.user_id.name"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- =========================================
+                             1. INFORMACIÓN DEL CLIENTE
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 16px;">
+                            1. Información del Cliente
+                        </h3>
+                        <table class="table table-sm" style="font-size: 11px;">
+                            <tr>
+                                <th style="width: 25%; background-color: #F7F7F7;">Nombre</th>
+                                <td style="width: 25%;">
+                                    <span t-field="doc.partner_id.name"/>
+                                </td>
+                                <th style="width: 25%; background-color: #F7F7F7;">Edad</th>
+                                <td style="width: 25%;">
+                                    <span t-esc="doc.partner_age or '—'"/>
+                                    <t t-if="doc.partner_age"> años</t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #F7F7F7;">Sexo</th>
+                                <td>
+                                    <span t-esc="doc.partner_sexo_label or '—'"/>
+                                </td>
+                                <th style="background-color: #F7F7F7;">Celular</th>
+                                <td>
+                                    <span t-esc="doc.partner_mobile or '—'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #F7F7F7;">Estatura</th>
+                                <td>
+                                    <t t-if="doc.partner_estatura_cm">
+                                        <span t-esc="doc.partner_estatura_cm"/> cm
+                                    </t>
+                                    <t t-else="">—</t>
+                                </td>
+                                <th style="background-color: #F7F7F7;">Peso</th>
+                                <td>
+                                    <t t-if="doc.partner_peso_kg">
+                                        <span t-esc="doc.partner_peso_kg"/> kg
+                                    </t>
+                                    <t t-else="">—</t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #F7F7F7;">Objetivo principal</th>
+                                <td colspan="3">
+                                    <span t-esc="doc.partner_objetivo or '—'"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Aviso de menor de edad -->
+                        <div t-if="doc.is_partner_minor"
+                             style="background-color: #FFF3CD; border-left: 4px solid #E57373;
+                                    padding: 8px 12px; margin: 8px 0; font-size: 11px;">
+                            <strong>ℹ Cliente menor de edad.</strong>
+                            Este plan requiere supervisión de un profesional de la
+                            salud y consentimiento del padre, madre o tutor legal.
+                        </div>
+
+                        <!-- =========================================
+                             2. ANTECEDENTE CLÍNICO
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;">
+                            2. Antecedente Clínico
+                        </h3>
+                        <table class="table table-sm" style="font-size: 11px;">
+                            <tr>
+                                <th style="width: 30%; background-color: #F7F7F7; vertical-align: top;">
+                                    Medicamentos actuales
+                                </th>
+                                <td style="white-space: pre-wrap;">
+                                    <t t-esc="doc.partner_medicamentos or 'Ninguno reportado'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #F7F7F7; vertical-align: top;">
+                                    Padecimientos diagnosticados
+                                </th>
+                                <td style="white-space: pre-wrap;">
+                                    <t t-esc="doc.partner_padecimientos or 'Ninguno reportado'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #F7F7F7; vertical-align: top;">
+                                    Suplementos actuales
+                                </th>
+                                <td style="white-space: pre-wrap;">
+                                    <t t-esc="doc.partner_suplementos or 'Ninguno reportado'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #F7F7F7; vertical-align: top;">
+                                    Alergias o restricciones
+                                </th>
+                                <td style="white-space: pre-wrap;">
+                                    <t t-esc="doc.partner_alergias or 'Ninguna reportada'"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- =========================================
+                             3. RESULTADOS DE LA VALORACIÓN
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;
+                                   page-break-before: auto;">
+                            3. Resultados de la Valoración
+                        </h3>
+                        <div style="font-size: 11px;">
+                            <t t-if="doc.resultados_valoracion">
+                                <div t-field="doc.resultados_valoracion"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">No se generaron resultados.</p>
+                            </t>
+                        </div>
+
+                        <!-- =========================================
+                             4. PRIORIDADES DEL CASO
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;">
+                            4. Prioridades del Caso
+                        </h3>
+                        <div style="font-size: 11px;">
+                            <t t-if="doc.prioridades_caso">
+                                <div t-field="doc.prioridades_caso"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Sin prioridades específicas registradas.</p>
+                            </t>
+                        </div>
+
+                        <!-- =========================================
+                             5. PLAN ESTRATÉGICO + PRODUCTOS
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;
+                                   page-break-before: auto;">
+                            5. Plan Estratégico con Productos VitalHealth
+                        </h3>
+
+                        <div style="font-size: 11px; margin-bottom: 12px;">
+                            <t t-if="doc.plan_estrategico">
+                                <div t-field="doc.plan_estrategico"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Plan estratégico no generado.</p>
+                            </t>
+                        </div>
+
+                        <!-- Tabla de productos VitalHealth -->
+                        <h4 style="color: #714B67; font-size: 13px; margin-top: 12px; margin-bottom: 2px;">
+                            Productos VitalHealth Recomendados
+                        </h4>
+                        <p style="font-size: 10px; color: #714B67; font-style: italic; margin: 2px 0 8px 0;">
+                            Estimación mensual (30 días)
+                        </p>
+                        <t t-if="doc.linea_producto_ids">
+                            <t t-set="total_estimado"
+                               t-value="sum(doc.linea_producto_ids.mapped('subtotal'))"/>
+                            <table class="table table-sm table-bordered"
+                                   style="font-size: 10px;">
+                                <thead style="background-color: #714B67; color: white;">
+                                    <tr>
+                                        <th style="width: 5%;">#</th>
+                                        <th style="width: 35%;">Producto</th>
+                                        <th style="width: 10%;" class="text-end">Cantidad</th>
+                                        <th style="width: 15%;" class="text-end">Precio unit.</th>
+                                        <th style="width: 15%;" class="text-end">Subtotal</th>
+                                        <th style="width: 20%;">Razón</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.linea_producto_ids" t-as="linea">
+                                        <td style="vertical-align: top;">
+                                            <span t-esc="linea_index + 1"/>
+                                        </td>
+                                        <!--
+                                            Celda Producto: nombre en bold +
+                                            dosis sugerida como subtítulo
+                                            pequeño gris justo debajo.
+                                            Estilo "propuesta comercial".
+                                        -->
+                                        <td style="vertical-align: top;">
+                                            <t t-if="linea.product_id">
+                                                <strong t-field="linea.product_id.display_name"/>
+                                            </t>
+                                            <t t-else="">
+                                                <em style="color: #E57373;">
+                                                    <t t-esc="linea.product_name_ia or '(sin nombre)'"/>
+                                                    — no encontrado en catálogo
+                                                </em>
+                                            </t>
+                                            <div t-if="linea.dosis_sugerida"
+                                                 style="font-size: 9px; color: #777; font-style: italic; margin-top: 2px;">
+                                                <span t-esc="linea.dosis_sugerida"/>
+                                            </div>
+                                        </td>
+                                        <td class="text-end" style="vertical-align: top;">
+                                            <span t-esc="linea.cantidad"
+                                                  t-options='{"widget": "float", "precision": 2}'/>
+                                        </td>
+                                        <td class="text-end" style="vertical-align: top;">
+                                            <t t-if="linea.product_id">
+                                                <span t-field="linea.precio_unitario"
+                                                      t-options='{"widget": "monetary", "display_currency": linea.currency_id}'/>
+                                            </t>
+                                            <t t-else="">—</t>
+                                        </td>
+                                        <td class="text-end" style="vertical-align: top;">
+                                            <t t-if="linea.product_id">
+                                                <span t-field="linea.subtotal"
+                                                      t-options='{"widget": "monetary", "display_currency": linea.currency_id}'/>
+                                            </t>
+                                            <t t-else="">—</t>
+                                        </td>
+                                        <td style="vertical-align: top;">
+                                            <span t-esc="linea.razon or ''"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot style="background-color: #F7F7F7; font-weight: bold;">
+                                    <tr>
+                                        <td colspan="4" class="text-end">
+                                            Total estimado del plan
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-esc="total_estimado"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+                                        </td>
+                                        <td/>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <p style="font-size: 9px; color: #888;">
+                                Los precios mostrados son referenciales según la lista
+                                de precios vigente del cliente al momento de generar
+                                esta valoración. Pueden variar al emitir cotización formal.
+                            </p>
+                            <p style="font-size: 9px; color: #714B67; font-weight: 600; margin-top: 4px;">
+                                Las cantidades corresponden a paquetes estimados para
+                                un programa de 30 días. La dosis sugerida es informativa
+                                y no debe confundirse con la cantidad de compra.
+                            </p>
+                        </t>
+                        <t t-else="">
+                            <p class="text-muted" style="font-size: 11px;">
+                                No hay productos recomendados en esta valoración.
+                            </p>
+                        </t>
+
+                        <!-- =========================================
+                             6. HÁBITOS COMPLEMENTARIOS
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;
+                                   page-break-before: auto;">
+                            6. Hábitos Complementarios
+                        </h3>
+                        <div style="font-size: 11px;">
+                            <t t-if="doc.habitos_complementarios">
+                                <div t-field="doc.habitos_complementarios"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Sin hábitos complementarios registrados.</p>
+                            </t>
+                        </div>
+
+                        <!-- =========================================
+                             7. RESUMEN ESTRATÉGICO
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;">
+                            7. Resumen Estratégico
+                        </h3>
+                        <div style="font-size: 11px; background-color: #F7F7F7;
+                                    padding: 12px; border-left: 4px solid #714B67;">
+                            <t t-if="doc.resumen_estrategico">
+                                <div t-field="doc.resumen_estrategico"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted mb-0">Sin resumen registrado.</p>
+                            </t>
+                        </div>
+
+                        <!-- =========================================
+                             8. RESULTADOS ESPERADOS
+                             ========================================= -->
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                   padding-bottom: 4px; margin-top: 20px;">
+                            8. Resultados Esperados
+                        </h3>
+                        <div style="font-size: 11px;">
+                            <t t-if="doc.resultados_esperados">
+                                <div t-field="doc.resultados_esperados"/>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Sin resultados esperados registrados.</p>
+                            </t>
+                        </div>
+
+                        <!-- =========================================
+                             9. ADVERTENCIAS
+                             ========================================= -->
+                        <h3 style="color: #E57373; border-bottom: 1px solid #E57373;
+                                   padding-bottom: 4px; margin-top: 20px;">
+                            ⚠ Advertencias
+                        </h3>
+                        <div style="font-size: 11px; background-color: #FFF3CD;
+                                    padding: 12px; border-left: 4px solid #E57373;">
+                            <t t-if="doc.advertencias">
+                                <div t-field="doc.advertencias"/>
+                            </t>
+                            <t t-else="">
+                                <p class="mb-0">
+                                    No se registraron advertencias específicas. Recuerda
+                                    que esta valoración es complementaria y no sustituye
+                                    consulta médica profesional.
+                                </p>
+                            </t>
+                        </div>
+
+                        <!-- =========================================
+                             10. CONSENTIMIENTO DEL CLIENTE (snapshot)
+                             ========================================= -->
+                        <div t-if="doc.consentimiento_cliente"
+                             style="page-break-before: auto; margin-top: 24px;">
+                            <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
+                                       padding-bottom: 4px;">
+                                Consentimiento del Cliente
+                            </h3>
+                            <div style="font-size: 10px; background-color: #F7F7F7;
+                                        padding: 12px; border: 1px solid #ddd;">
+                                <p style="margin-bottom: 8px;">
+                                    <strong>Registrado el:</strong>
+                                    <span t-field="doc.consentimiento_fecha"
+                                          t-options='{"format": "dd/MM/yyyy HH:mm"}'/>
+                                    <t t-if="doc.consentimiento_responsable_id">
+                                        <strong> · Por:</strong>
+                                        <span t-field="doc.consentimiento_responsable_id.name"/>
+                                    </t>
+                                </p>
+                                <hr style="margin: 8px 0;"/>
+                                <div t-field="doc.consentimiento_texto"/>
+                            </div>
+                        </div>
+
+                        <!-- =========================================
+                             AVISO LEGAL (siempre visible)
+                             ========================================= -->
+                        <div style="margin-top: 24px; padding: 16px;
+                                    background-color: #FFF3CD;
+                                    border: 2px solid #E57373;
+                                    page-break-inside: avoid;">
+                            <h4 style="color: #E57373; margin-top: 0; font-weight: 700;">
+                                AVISO LEGAL
+                            </h4>
+                            <p style="font-size: 11px; font-weight: 600; color: #714B67; margin-bottom: 8px;">
+                                Plan funcional y cotización estimada para 30 días.
+                            </p>
+                            <p style="font-size: 10px; margin-bottom: 6px;">
+                                Esta <strong>valoración es de carácter funcional y
+                                complementario</strong>. NO constituye diagnóstico médico,
+                                NO sustituye consulta, tratamiento ni recomendación de un
+                                profesional de la salud certificado.
+                            </p>
+                            <p style="font-size: 10px; margin-bottom: 6px;">
+                                La información se generó con apoyo de inteligencia
+                                artificial sobre los datos proporcionados por el cliente
+                                y las fuentes autorizadas del catálogo VitalHealth.
+                                <strong>No suspendas medicamentos</strong> ni inicies
+                                suplementación sin consultar a tu médico tratante,
+                                especialmente si tienes condiciones diagnosticadas,
+                                tomas medicamentos o presentas alergias.
+                            </p>
+                            <p style="font-size: 10px; margin-bottom: 6px;">
+                                Los productos VitalHealth recomendados son sugerencias
+                                orientativas basadas exclusivamente en el catálogo
+                                disponible. Verifica ingredientes, contraindicaciones
+                                y dosis con la ficha técnica de cada producto antes
+                                de su uso.
+                            </p>
+                            <p style="font-size: 10px; margin-bottom: 0;">
+                                <strong>
+                                    <span t-field="doc.company_id.name"/>
+                                    y el equipo emisor de esta valoración
+                                    no asumen responsabilidad por interpretaciones, decisiones
+                                    o consecuencias derivadas del uso o no uso de la
+                                    información aquí contenida sin acompañamiento profesional
+                                    adecuado.
+                                </strong>
+                            </p>
+                            <p t-if="doc.consentimiento_cliente"
+                               style="font-size: 9px; margin-top: 12px;
+                                      color: #555; font-style: italic;">
+                                Consentimiento del cliente registrado el
+                                <span t-field="doc.consentimiento_fecha"
+                                      t-options='{"format": "dd/MM/yyyy HH:mm"}'/>.
+                            </p>
+                        </div>
+
+                        <!-- Pie con folio -->
+                        <div style="margin-top: 16px; padding-top: 8px;
+                                    border-top: 1px solid #ddd;
+                                    text-align: center; font-size: 9px; color: #888;">
+                            Folio
+                            <span style="color: #714B67;" t-field="doc.name"/>
+                            <t t-if="doc.pdf_generated_at">
+                                · Generado el
+                                <span t-field="doc.pdf_generated_at"
+                                      t-options='{"widget": "datetime", "format": "dd/MM/yyyy HH:mm"}'/>
+                            </t>
+                            · <span t-field="doc.company_id.name"/>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

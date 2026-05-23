@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Datos seed BioCuántico — Fase 2.5
+
+        * 14 sistemas corporales con keywords expandidas:
+            cardiovascular, digestivo, endocrino, inmune, linfatico, nervioso,
+            respiratorio, urinario, reproductor, musculoesqueletico,
+            tegumentario, sensorial, toxicidad (Fase 2.4),
+            metabolico (Fase 2.5).
+        * Mapeo inicial de etiquetas de estado.
+
+        IMPORTANTE — noupdate="1":
+        Las instalaciones que ya cargaron este seed previamente NO recibirán
+        las nuevas keywords al ejecutar -u valoracion (sólo el registro nuevo
+        'metabolico' se crea por ser ID inédito). Para refrescar keywords de
+        sistemas existentes, ejecutar el SQL de migración documentado en el
+        manifest CHANGELOG, o editar cada sistema en
+        Valoración → Configuración → BioCuántico → Sistemas Corporales.
+    -->
+    <data noupdate="1">
+
+        <!-- =========================================================
+             Sistemas corporales BioCuánticos
+             ========================================================= -->
+
+        <record id="biocuantico_sistema_cardiovascular" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Cardiovascular</field>
+            <field name="code">cardiovascular</field>
+            <field name="sequence">10</field>
+            <field name="description">Corazón, vasos sanguíneos, presión, ritmo y circulación.</field>
+            <field name="keywords">cardiovascular, corazon, presion arterial, ritmo cardiaco, circulacion, vascular, miocardio, miocardial, demanda miocardial, demanda de sangre, cerebrovascular, sangre, hemoglobina, hematocrito, plaquetas, arteria, arteriosclerosis, aterosclerosis, ateromatosis, ateroma, infarto, angina, taquicardia, bradicardia, arritmia, oxigenacion sanguinea, oxigeno en la sangre, volumen de oxigeno</field>
+        </record>
+
+        <record id="biocuantico_sistema_digestivo" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Digestivo</field>
+            <field name="code">digestivo</field>
+            <field name="sequence">20</field>
+            <field name="description">Tracto digestivo, hígado, vesícula, estómago, intestinos.</field>
+            <field name="keywords">digestivo, gastrointestinal, estomago, intestino, higado, vesicula, pancreas, bilis, biliar, estreñimiento, microbiota, flora intestinal, gastritis, ulcera gastrica, reflujo gastroesofagico, colon, duodeno, helicobacter, acidez gastrica</field>
+        </record>
+
+        <record id="biocuantico_sistema_endocrino" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Endocrino</field>
+            <field name="code">endocrino</field>
+            <field name="sequence">30</field>
+            <field name="description">Tiroides, suprarrenales, páncreas endocrino, glándulas.</field>
+            <field name="keywords">endocrino, tiroides, tiroideo, suprarrenal, glandula, hormonal, hipofisis, hipofisiario, t3, t4, tiroglobulina, tiroxina, triyodotironina, tsh, progesterona, prolactina, estrogeno, estradiol, testosterona, fsh, lh, cortisol, dhea, melatonina, insulina, oxitocina, aldosterona, hormona de crecimiento</field>
+        </record>
+
+        <record id="biocuantico_sistema_inmune" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Inmune</field>
+            <field name="code">inmune</field>
+            <field name="sequence">40</field>
+            <field name="description">Defensas, inflamación, respuesta inmunológica.</field>
+            <field name="keywords">inmune, inmunologico, defensas, inflamacion, autoinmune, iga secretora, igg, igm, ige, linfocitos, leucocitos, neutrofilos</field>
+        </record>
+
+        <record id="biocuantico_sistema_linfatico" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Linfático</field>
+            <field name="code">linfatico</field>
+            <field name="sequence">50</field>
+            <field name="description">Ganglios, drenaje linfático, bazo.</field>
+            <field name="keywords">linfatico, linfa, ganglios, bazo, drenaje linfatico</field>
+        </record>
+
+        <record id="biocuantico_sistema_nervioso" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Nervioso</field>
+            <field name="code">nervioso</field>
+            <field name="sequence">60</field>
+            <field name="description">SNC, SNP, sistema nervioso autónomo, equilibrio neurológico.</field>
+            <field name="keywords">nervioso, neurologico, cerebro, nervios, snc, neuronal, sinapsis, neurotransmisor, serotonina, dopamina, gaba, acetilcolina, noradrenalina, sistema nervioso autonomo, equilibrio autonomico</field>
+        </record>
+
+        <record id="biocuantico_sistema_respiratorio" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Respiratorio</field>
+            <field name="code">respiratorio</field>
+            <field name="sequence">70</field>
+            <field name="description">Pulmones, vías respiratorias, oxigenación.</field>
+            <field name="keywords">respiratorio, pulmonar, pulmones, bronquios, capacidad pulmonar, capacidad vital, capacidad residual, capacidad residual funcional, frc, fev1, espirometr, alveolo, alveolos, alveolar, diafragma, vias respiratorias</field>
+        </record>
+
+        <record id="biocuantico_sistema_urinario" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Urinario</field>
+            <field name="code">urinario</field>
+            <field name="sequence">80</field>
+            <field name="description">Riñones, vejiga, función renal.</field>
+            <field name="keywords">urinario, renal, riñon, vejiga, creatinina, urea, nefron, filtrado glomerular, acido urico</field>
+        </record>
+
+        <record id="biocuantico_sistema_reproductor" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Reproductor</field>
+            <field name="code">reproductor</field>
+            <field name="sequence">90</field>
+            <field name="description">Aparato reproductor masculino y femenino.</field>
+            <field name="keywords">reproductor, ginecologico, prostata, ovarios, testiculos, utero, endometrio, menstrual, fertilidad, libido</field>
+        </record>
+
+        <record id="biocuantico_sistema_musculoesqueletico" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Musculoesquelético</field>
+            <field name="code">musculoesqueletico</field>
+            <field name="sequence">100</field>
+            <field name="description">Huesos, articulaciones, músculos, postura.</field>
+            <field name="keywords">musculoesqueletico, oseo, huesos, articulaciones, columna, densidad osea, lumbar, cervical, dorsal, sacro, rodilla, cadera, hombro, tendon, tendinitis, osteoporosis, osteopenia, calcio osea, colageno tipo i</field>
+        </record>
+
+        <record id="biocuantico_sistema_tegumentario" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Tegumentario</field>
+            <field name="code">tegumentario</field>
+            <field name="sequence">110</field>
+            <field name="description">Piel, cabello, uñas.</field>
+            <field name="keywords">tegumentario, piel, cabello, uñas, dermatologico, colageno, humectacion cutanea, hidratacion cutanea, dermis, epidermis, sebo, sebaceo, arruga, arrugas, bolsas en ojos, manchas cutaneas, celulitis, elasticidad cutanea, flacidez, estria</field>
+        </record>
+
+        <record id="biocuantico_sistema_sensorial" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Sensorial</field>
+            <field name="code">sensorial</field>
+            <field name="sequence">120</field>
+            <field name="description">Visión, audición, equilibrio, olfato, gusto.</field>
+            <field name="keywords">sensorial, vision, visual, ocular, audicion, oido, equilibrio, olfato, gusto, ojo, ojos, celular del ojo, celulas oculares, retina, retiniano, cornea, cristalino, macula, agudeza visual, nervio optico, lacrimal, pupila, iris, tímpano, coclea, auditivo, audicion alterada</field>
+        </record>
+
+        <record id="biocuantico_sistema_toxicidad" model="valoracion.biocuantico.sistema">
+            <field name="name">Toxicidad / Metales pesados</field>
+            <field name="code">toxicidad</field>
+            <field name="sequence">130</field>
+            <field name="description">Carga tóxica, metales pesados, exposición ambiental, biotransformación de tóxicos.</field>
+            <field name="keywords">aluminio, arsenico, mercurio, plomo, cadmio, niquel, manganeso, cromo, antimonio, bario, berilio, talio, cobre, zinc, metales pesados, metal pesado, toxicidad, toxico, carga toxica, intoxicacion, contaminantes, xenobioticos, exposicion ambiental, biotransformacion, desintoxicacion, detox hepatico</field>
+        </record>
+
+        <record id="biocuantico_sistema_metabolico" model="valoracion.biocuantico.sistema">
+            <field name="name">Sistema Metabólico / Nutricional</field>
+            <field name="code">metabolico</field>
+            <field name="sequence">140</field>
+            <field name="description">Macronutrientes (aminoácidos, proteínas, lípidos, carbohidratos), perfil lipídico (HDL/LDL/VLDL/triglicéridos), glucemia y vitaminas. Captura parámetros nutricionales y metabólicos que no son específicos cardiovasculares ni endocrinos.</field>
+            <field name="keywords">metabolico, metabolismo, metabolica, nutricional, nutricion, aminoacido, aminoacidos, proteina, proteinas, carbohidrato, carbohidratos, lipido, lipidos, lipidico, perfil lipidico, glucido, glucidos, vitamina, mineral nutricional, balance nutricional, sintesis proteica, masa magra, masa muscular, grasa corporal, indice metabolico, hdl, ldl, vldl, lipoproteina, trigliceridos, triglicerido, colesterol total, colesterol, glucosa, glucemia, hba1c, glicada, hemoglobina glicada, acido folico, b12, vitamina d, vitamina e, vitamina c, omega 3, omega 6</field>
+        </record>
+
+        <!-- =========================================================
+             Mapeo inicial de etiquetas de estado
+             (etiqueta raw del reporte → estado normalizado interno)
+             ========================================================= -->
+
+        <!-- ÓPTIMO -->
+        <record id="biocuantico_estado_optimo_optimo" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Óptimo</field>
+            <field name="normalized">optimo</field>
+        </record>
+        <record id="biocuantico_estado_optimo_excelente" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Excelente</field>
+            <field name="normalized">optimo</field>
+        </record>
+
+        <!-- NORMAL -->
+        <record id="biocuantico_estado_normal_normal" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Normal</field>
+            <field name="normalized">normal</field>
+        </record>
+        <record id="biocuantico_estado_normal_equilibrado" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Equilibrado</field>
+            <field name="normalized">normal</field>
+        </record>
+        <record id="biocuantico_estado_normal_sano" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Sano</field>
+            <field name="normalized">normal</field>
+        </record>
+        <record id="biocuantico_estado_normal_dentro_rango" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Dentro de rango</field>
+            <field name="normalized">normal</field>
+        </record>
+
+        <!-- LEVE -->
+        <record id="biocuantico_estado_leve_leve" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Leve</field>
+            <field name="normalized">leve</field>
+        </record>
+        <record id="biocuantico_estado_leve_levemente" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Levemente alterado</field>
+            <field name="normalized">leve</field>
+        </record>
+        <record id="biocuantico_estado_leve_ligero" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Ligero</field>
+            <field name="normalized">leve</field>
+        </record>
+
+        <!-- MODERADO -->
+        <record id="biocuantico_estado_moderado_moderado" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Moderado</field>
+            <field name="normalized">moderado</field>
+        </record>
+        <record id="biocuantico_estado_moderado_moderadamente" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Moderadamente alterado</field>
+            <field name="normalized">moderado</field>
+        </record>
+
+        <!-- SEVERO -->
+        <record id="biocuantico_estado_severo_severo" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Severo</field>
+            <field name="normalized">severo</field>
+        </record>
+        <record id="biocuantico_estado_severo_severamente" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Severamente alterado</field>
+            <field name="normalized">severo</field>
+        </record>
+        <record id="biocuantico_estado_severo_alto" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Alterado</field>
+            <field name="normalized">severo</field>
+        </record>
+
+        <!-- CRÍTICO -->
+        <record id="biocuantico_estado_critico_critico" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Crítico</field>
+            <field name="normalized">critico</field>
+        </record>
+        <record id="biocuantico_estado_critico_grave" model="valoracion.biocuantico.estado.mapeo">
+            <field name="raw_label">Grave</field>
+            <field name="normalized">critico</field>
+        </record>
+
+    </data>
+</odoo>

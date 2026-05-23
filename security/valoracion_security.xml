@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =========================================================
+         Categoría de módulo y grupos
+         ========================================================= -->
+    <data noupdate="0">
+
+        <record id="module_category_valoracion" model="ir.module.category">
+            <field name="name">Valoración VitalHealth</field>
+            <field name="description">Permisos del módulo Valoración VitalHealth.</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- Nivel 1: Usuario -->
+        <record id="group_valoracion_user" model="res.groups">
+            <field name="name">Usuario de Valoración</field>
+            <field name="category_id" ref="module_category_valoracion"/>
+            <field name="comment">
+Puede crear, modificar y ver únicamente sus propias valoraciones.
+Puede crear contactos, subir archivos del cliente y generar valoraciones
+si se cumplen todos los requisitos. No puede administrar fuentes, plantillas
+de prompt ni configuración global de IA.
+            </field>
+        </record>
+
+        <!-- Nivel 2: Super Usuario (hereda Usuario) -->
+        <record id="group_valoracion_super_user" model="res.groups">
+            <field name="name">Super Usuario de Valoración</field>
+            <field name="category_id" ref="module_category_valoracion"/>
+            <field name="implied_ids" eval="[(4, ref('group_valoracion_user'))]"/>
+            <field name="comment">
+Puede ver todos los documentos de todos los usuarios. Puede crear y
+modificar valoraciones de cualquier usuario. Puede administrar fuentes
+para IA. No tiene acceso a la configuración técnica sensible (API key,
+plantillas de prompt) ni puede eliminar logs de IA.
+            </field>
+        </record>
+
+        <!-- Nivel 3: Administrador (hereda Super Usuario) -->
+        <record id="group_valoracion_admin" model="res.groups">
+            <field name="name">Administrador de Valoración</field>
+            <field name="category_id" ref="module_category_valoracion"/>
+            <field name="implied_ids" eval="[(4, ref('group_valoracion_super_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="comment">
+Acceso total al módulo: configura IA, administra fuentes, plantillas de
+prompt, log de IA, reportes, citas y permisos. Puede ver, crear,
+modificar y eliminar todos los documentos.
+            </field>
+        </record>
+
+    </data>
+
+    <!-- =========================================================
+         Record rules
+         ========================================================= -->
+    <data noupdate="1">
+
+        <!-- ======== valoracion.valoracion ======== -->
+
+        <!-- Usuario: solo sus propias valoraciones -->
+        <record id="rule_valoracion_user_own" model="ir.rule">
+            <field name="name">Valoración: solo propias (Usuario)</field>
+            <field name="model_id" ref="model_valoracion_valoracion"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Super Usuario y Admin: todas -->
+        <record id="rule_valoracion_super_all" model="ir.rule">
+            <field name="name">Valoración: todas (Super Usuario / Admin)</field>
+            <field name="model_id" ref="model_valoracion_valoracion"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_super_user'))]"/>
+        </record>
+
+        <!-- Multi-compañía (regla global) -->
+        <record id="rule_valoracion_company" model="ir.rule">
+            <field name="name">Valoración: multi-compañía</field>
+            <field name="model_id" ref="model_valoracion_valoracion"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <!-- ======== valoracion.archivo.cliente ======== -->
+
+        <record id="rule_valoracion_archivo_user" model="ir.rule">
+            <field name="name">Archivo Cliente: solo propios (Usuario)</field>
+            <field name="model_id" ref="model_valoracion_archivo_cliente"/>
+            <field name="domain_force">[('valoracion_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_user'))]"/>
+        </record>
+
+        <record id="rule_valoracion_archivo_super" model="ir.rule">
+            <field name="name">Archivo Cliente: todos (Super/Admin)</field>
+            <field name="model_id" ref="model_valoracion_archivo_cliente"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_super_user'))]"/>
+        </record>
+
+        <!-- ======== valoracion.linea.producto ======== -->
+
+        <record id="rule_valoracion_linea_user" model="ir.rule">
+            <field name="name">Línea de Producto: solo propias (Usuario)</field>
+            <field name="model_id" ref="model_valoracion_linea_producto"/>
+            <field name="domain_force">[('valoracion_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_user'))]"/>
+        </record>
+
+        <record id="rule_valoracion_linea_super" model="ir.rule">
+            <field name="name">Línea de Producto: todas (Super/Admin)</field>
+            <field name="model_id" ref="model_valoracion_linea_producto"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_super_user'))]"/>
+        </record>
+
+        <!-- ======== valoracion.fuente ======== -->
+
+        <record id="rule_valoracion_fuente_company" model="ir.rule">
+            <field name="name">Fuente VitalHealth: multi-compañía</field>
+            <field name="model_id" ref="model_valoracion_fuente"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <!-- ======== valoracion.log.ia ======== -->
+
+        <record id="rule_valoracion_log_user" model="ir.rule">
+            <field name="name">Log IA: solo propios (Usuario)</field>
+            <field name="model_id" ref="model_valoracion_log_ia"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_user'))]"/>
+        </record>
+
+        <record id="rule_valoracion_log_super" model="ir.rule">
+            <field name="name">Log IA: todos (Super/Admin)</field>
+            <field name="model_id" ref="model_valoracion_log_ia"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_valoracion_super_user'))]"/>
+        </record>
+
+        <!-- ======== valoracion.producto.regla ======== -->
+
+        <record id="rule_valoracion_producto_regla_company" model="ir.rule">
+            <field name="name">Regla Producto VitalHealth: multi-compañía</field>
+            <field name="model_id" ref="model_valoracion_producto_regla"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+    </data>
+
+</odoo>
