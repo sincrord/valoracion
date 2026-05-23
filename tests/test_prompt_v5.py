@@ -198,6 +198,68 @@ class TestAccionAplicarV5(TransactionCase):
         self.assertTrue(rec.active)
         self.assertEqual(rec.notes, 'notas internas')
 
+    def test_aplicar_v5_no_falla_sin_mail_thread(self):
+        """Microfix 3.1.1: el modelo no hereda mail.thread; la acción
+        debe completar sin lanzar AttributeError por message_post."""
+        rec = self._get_template()
+        try:
+            rec.action_aplicar_prompt_v5()
+        except AttributeError as e:
+            if 'message_post' in str(e):
+                self.fail("message_post sin guardia rompió la acción: %s" % e)
+            raise
+        self.assertEqual(rec.version, '5.0')
+
+    def test_output_schema_persistido_contiene_programas_funcionales(self):
+        """Microfix 3.1.1: tras aplicar v5, el output_schema persistido
+        en BD DEBE contener programas_funcionales. Si message_post lanzaba
+        excepción, la transacción hacía rollback y este campo no quedaba."""
+        rec = self._get_template()
+        rec.action_aplicar_prompt_v5()
+        self.assertTrue(rec.output_schema,
+                        "output_schema vacío tras aplicar v5")
+        try:
+            parsed = _json.loads(rec.output_schema)
+        except Exception as e:
+            self.fail("output_schema persistido no es JSON válido: %s" % e)
+        self.assertIn('programas_funcionales',
+                      (parsed.get('properties') or {}),
+                      "BD no recibió programas_funcionales — posible rollback "
+                      "por message_post")
+        # No debe ser required (es opcional)
+        self.assertNotIn('programas_funcionales',
+                         set(parsed.get('required') or []))
+
+    def test_aplicar_v5_persiste_los_4_campos(self):
+        """Confirma que todos los campos del write se persistieron en BD."""
+        from odoo.addons.valoracion.models.prompt_v5_content import (
+            SYSTEM_PROMPT, USER_PROMPT_TEMPLATE, OUTPUT_SCHEMA, VERSION,
+        )
+        rec = self._get_template()
+        rec.write({
+            'system_prompt': 'X', 'user_prompt_template': 'X',
+            'output_schema': '{}', 'version': '0.0',
+        })
+        rec.action_aplicar_prompt_v5()
+        self.assertEqual(rec.version, VERSION)
+        self.assertEqual(rec.system_prompt, SYSTEM_PROMPT)
+        self.assertEqual(rec.user_prompt_template, USER_PROMPT_TEMPLATE)
+        self.assertEqual(rec.output_schema, OUTPUT_SCHEMA)
+
+    def test_restaurar_v4_1_no_falla_sin_mail_thread(self):
+        """Mismo microfix aplicado a la acción v4.1."""
+        rec = self._get_template()
+        try:
+            rec.action_restaurar_v4_oficial()
+        except AttributeError as e:
+            if 'message_post' in str(e):
+                self.fail("v4.1 message_post sin guardia rompe: %s" % e)
+            raise
+        from odoo.addons.valoracion.models.prompt_v4_1_content import (
+            VERSION as V41_VERSION,
+        )
+        self.assertEqual(rec.version, V41_VERSION)
+
     def test_rollback_v4_1_despues_de_v5(self):
         """Tras aplicar v5, el rollback a v4.1 debe funcionar y dejar la
         plantilla en el wording oficial v4.1."""
@@ -212,9 +274,9 @@ class TestAccionAplicarV5(TransactionCase):
 
 
 @tagged('post_install', '-at_install', 'valoracion', 'prompt_v5')
-class TestManifest310(TransactionCase):
+class TestManifest311(TransactionCase):
 
-    def test_version_3_1_0_o_superior(self):
+    def test_version_3_1_1_o_superior(self):
         modulo = self.env['ir.module.module'].search(
             [('name', '=', 'valoracion')], limit=1,
         )
@@ -222,8 +284,8 @@ class TestManifest310(TransactionCase):
         v = modulo.latest_version or ''
         parts = v.split('.')
         if len(parts) >= 5:
-            major = int(parts[2]); minor = int(parts[3])
+            major = int(parts[2]); minor = int(parts[3]); patch = int(parts[4])
             self.assertGreaterEqual(
-                (major, minor), (3, 1),
-                "Manifest %s < 18.0.3.1.0 (Prompt v5)" % v,
+                (major, minor, patch), (3, 1, 1),
+                "Manifest %s < 18.0.3.1.1 (microfix v5 message_post)" % v,
             )
