@@ -41,6 +41,12 @@
                             class="btn-secondary"
                             confirm="Esto sobreescribirá system_prompt, user_prompt_template y output_schema con el Prompt v5 (más humano, programas funcionales, mismas restricciones legales). Se preservan name, is_default, active y notes. Rollback disponible con 'Restaurar v4.1 oficial'. ¿Continuar?"
                             help="Aplica el Prompt v5: tono más humano y wellness, programas funcionales (campo opcional nuevo), mismas restricciones legales que v4.1. Los parsers existentes siguen funcionando porque programas_funcionales no es required."/>
+                    <button name="action_aplicar_prompt_v5_1"
+                            string="Aplicar Prompt v5.1"
+                            type="object"
+                            class="btn-secondary"
+                            confirm="Esto sobreescribirá system_prompt, user_prompt_template y output_schema con el Prompt v5.1 (wellness premium, lista negra de términos diagnósticos, prosa narrativa). Mismo schema que v5. Rollback con 'Restaurar v4.1 oficial' o 'Aplicar Prompt v5'. ¿Continuar?"
+                            help="Aplica el Prompt v5.1: wording wellness premium, lista negra de palabras diagnósticas (patología/trastorno/enfermedad/diagnóstico/síndrome/padece), prosa narrativa en lugar de bullets para las secciones del cliente. Schema idéntico a v5, mismas restricciones legales."/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon"

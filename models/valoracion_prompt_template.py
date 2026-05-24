@@ -278,3 +278,51 @@ class ValoracionPromptTemplate(models.Model):
                 'sticky': False,
             },
         }
+
+    def action_aplicar_prompt_v5_1(self):
+        """Aplica el wording oficial v5.1 (wellness premium con lista negra)
+        sobre esta plantilla. Convive con v4.1, v5.0 y v5.1 disponibles
+        por sus respectivas acciones; rollback inmediato pulsando
+        'Restaurar v4.1 oficial'.
+
+        Cambios respecto v5.0:
+          * Lista negra explícita de términos diagnósticos prohibidos en
+            cualquier sección que llegue al cliente.
+          * Pide prosa narrativa (no bullets) en resultados_valoracion,
+            plan_estrategico, resumen_estrategico, resultados_esperados.
+          * Mantiene mismo schema (compatibilidad 100%).
+        """
+        from .prompt_v5_1_content import (
+            SYSTEM_PROMPT as V51_SYSTEM_PROMPT,
+            USER_PROMPT_TEMPLATE as V51_USER_PROMPT_TEMPLATE,
+            OUTPUT_SCHEMA as V51_OUTPUT_SCHEMA,
+            VERSION as V51_VERSION,
+        )
+        for rec in self:
+            rec.write({
+                'system_prompt': V51_SYSTEM_PROMPT,
+                'user_prompt_template': V51_USER_PROMPT_TEMPLATE,
+                'output_schema': V51_OUTPUT_SCHEMA,
+                'version': V51_VERSION,
+            })
+            if hasattr(rec, 'message_post'):
+                rec.message_post(body=_(
+                    "Plantilla actualizada al wording v%s (wellness premium). "
+                    "Se sobreescribieron: system_prompt, "
+                    "user_prompt_template, output_schema. Se preservaron: "
+                    "name, is_default, active, notes."
+                ) % V51_VERSION)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Plantilla actualizada a v5.1'),
+                'message': _(
+                    "Wording v%s aplicado sobre %d plantilla(s). "
+                    "Rollback con 'Restaurar v4.1 oficial' o 'Aplicar "
+                    "Prompt v5'."
+                ) % (V51_VERSION, len(self)),
+                'type': 'success',
+                'sticky': False,
+            },
+        }
