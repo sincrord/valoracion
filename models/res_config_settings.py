@@ -233,6 +233,26 @@ class ResConfigSettings(models.TransientModel):
     )
 
     # =========================================================
+    # Narrative renderer (Fase 4.2 — modo wellness en el PDF)
+    # =========================================================
+    valoracion_narrative_mode = fields.Selection(
+        selection=[
+            ('legacy', 'Legacy (labels técnicos)'),
+            ('wellness', 'Wellness premium (prosa humanizada)'),
+        ],
+        string='Modo de narrativa del PDF',
+        config_parameter='valoracion.narrative_mode',
+        default='legacy',
+        help='Controla cómo se renderizan las secciones analisis_archivo '
+             'y prioridades_caso en el PDF cliente. legacy: bullets con '
+             'labels como "Hallazgos principales", "Evidencia (archivo)", '
+             '"Importancia". wellness: prosa humanizada vía '
+             'narrative_renderer.py + blacklist de términos diagnósticos '
+             '+ vocabulario wellness premium. El motor v3 y los productos '
+             'NO se ven afectados — sólo cambia la presentación.',
+    )
+
+    # =========================================================
     # Texto del consentimiento por defecto
     # =========================================================
     # IMPORTANTE: este campo es Text (multilinea), por lo que NO puede usar

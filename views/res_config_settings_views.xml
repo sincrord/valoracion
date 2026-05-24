@@ -38,6 +38,11 @@
                                  help="Selector del motor de parsing BioCuántico. legacy = parser actual (estable). v3 = pipeline puro nuevo (extractor → classifier → severity → ranker → master_summary). Si v3 falla, el sistema hace fallback automático a legacy SIN romper la valoración.">
                             <field name="valoracion_biocuantico_motor_version"/>
                         </setting>
+                        <setting id="narrative_mode"
+                                 string="Modo de narrativa del PDF"
+                                 help="Selector de la capa narrativa del PDF cliente. legacy = bullets con labels técnicos ('Hallazgos principales', 'Evidencia', 'Importancia'). wellness = prosa humanizada con blacklist diagnóstica y vocabulario wellness premium. NO afecta motor v3 ni productos.">
+                            <field name="valoracion_narrative_mode"/>
+                        </setting>
                     </block>
 
                     <block title="Claude (Anthropic)"

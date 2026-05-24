@@ -22,7 +22,7 @@ que proporciono (incluidos antecedentes, archivos y resultados) con el único fi
 una valoración funcional con apoyo de inteligencia artificial.</p>
 <p>Reconozco que:</p>
 <ul>
-<li>Esta valoración es de carácter <b> funcional y complementario</b>; no constituye
+<li>Esta valoración es de <b>carácter funcional y complementario</b>; no constituye
 diagnóstico médico ni sustituye consulta o tratamiento profesional.</li>
 <li>Los datos podrán ser procesados por el proveedor de inteligencia artificial contratado
 por {company_name} con las medidas técnicas y organizativas correspondientes.</li>
@@ -2041,6 +2041,17 @@ class Valoracion(models.Model):
             useful.append(stripped)
         return sum(len(line) for line in useful)
 
+    def _get_narrative_mode(self):
+        """Lee el setting `valoracion.narrative_mode` con normalización
+        defensiva (default 'legacy'). Fase 4.2."""
+        try:
+            v = (self.env['ir.config_parameter'].sudo()
+                 .get_param('valoracion.narrative_mode', 'legacy')
+                 or 'legacy')
+        except Exception:
+            return 'legacy'
+        return v if v in ('legacy', 'wellness') else 'legacy'
+
     def _render_analisis_archivo_html(self, analisis):
         """Convierte el objeto analisis_archivo_cliente devuelto por la IA a
         un bloque HTML estructurado para incrustar al inicio de
@@ -2057,6 +2068,17 @@ class Valoracion(models.Model):
         if not isinstance(analisis, dict):
             return ''
 
+        # Fase 4.2: toggle wellness — delega al renderer puro si el
+        # setting está en 'wellness'. Legacy queda intacto.
+        if self._get_narrative_mode() == 'wellness':
+            try:
+                from .narrative_renderer import render_analisis_narrative
+                return render_analisis_narrative(analisis)
+            except Exception:  # pragma: no cover — defensivo
+                _logger.exception(
+                    "narrative_renderer.render_analisis_narrative falló — "
+                    "cayendo a legacy")
+
         from markupsafe import escape
 
         parts = ['<h4 style="color:#714B67;margin-bottom:6px;">Análisis del archivo del cliente</h4>']
@@ -2071,9 +2093,10 @@ class Valoracion(models.Model):
                 'y vuelve a generar.</p>'
             )
 
-        calidad = analisis.get('calidad_del_archivo')
-        if calidad:
-            parts.append('<p><b>Calidad del archivo:</b> %s</p>' % escape(calidad))
+        # Fase 4.2: "Calidad del archivo" es metadato técnico/auditoría
+        # interno; se omite del PDF cliente para no romper la sensación
+        # wellness. Sigue disponible en el JSON crudo si se necesita
+        # auditar (log IA / vista admin).
 
         for clave, etiqueta in (
             ('hallazgos_principales', 'Hallazgos principales'),
@@ -2109,6 +2132,17 @@ class Valoracion(models.Model):
         Returns:
             str HTML.
         """
+        # Fase 4.2: toggle wellness — delega al renderer puro si el
+        # setting está en 'wellness'. Legacy queda intacto.
+        if self._get_narrative_mode() == 'wellness':
+            try:
+                from .narrative_renderer import render_prioridades_narrative
+                return render_prioridades_narrative(prioridades)
+            except Exception:  # pragma: no cover — defensivo
+                _logger.exception(
+                    "narrative_renderer.render_prioridades_narrative falló — "
+                    "cayendo a legacy")
+
         if isinstance(prioridades, str):
             # Backward compat: la IA devolvió string (versión antigua del prompt)
             return prioridades
