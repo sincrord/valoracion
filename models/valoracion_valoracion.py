@@ -1196,16 +1196,32 @@ class Valoracion(models.Model):
             'ai_raw_response': result.get('raw_response') or '',
             'prompt_enviado': prompt_snapshot_capped,
         })
-        self.write({
+        # Fase 4.3: si el toggle está en 'wellness', humanizamos los
+        # campos narrativos que la IA pudo haber escrito con labels
+        # técnicos embebidos. NO se toca 'advertencias' (requisito legal:
+        # menciones literales por medicamento/padecimiento/alergia).
+        narrative_fields = {
             'resultados_valoracion': resultados_combinados or '',
             'prioridades_caso': prioridades_html or '',
             'plan_estrategico': data.get('plan_estrategico') or '',
             'habitos_complementarios': data.get('habitos_complementarios') or '',
             'resumen_estrategico': data.get('resumen_estrategico') or '',
             'resultados_esperados': data.get('resultados_esperados') or '',
-            'advertencias': data.get('advertencias') or '',
-            'state': 'generado',
-        })
+        }
+        if self._get_narrative_mode() == 'wellness':
+            try:
+                from .narrative_renderer import humanize_narrative_field
+                for k in list(narrative_fields.keys()):
+                    narrative_fields[k] = humanize_narrative_field(
+                        narrative_fields[k])
+            except Exception:  # pragma: no cover — defensivo
+                _logger.exception(
+                    "narrative_renderer.humanize_narrative_field falló — "
+                    "guardando contenido original")
+        write_payload = dict(narrative_fields)
+        write_payload['advertencias'] = data.get('advertencias') or ''
+        write_payload['state'] = 'generado'
+        self.write(write_payload)
 
         # 12. Mensaje resumen en chatter
         msg = [_("✓ Valoración generada por IA. Revisa antes de descargar el PDF.")]

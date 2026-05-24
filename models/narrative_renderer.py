@@ -35,7 +35,7 @@ import re
 import unicodedata
 
 
-VERSION = '4.2.0'
+VERSION = '4.3.0'
 
 
 # =====================================================================
@@ -98,6 +98,84 @@ WELLNESS_VOCAB = (
 )
 
 
+# =====================================================================
+# Fase 4.3 — reescrituras de sección + suavizado + flujo emocional
+# =====================================================================
+
+# Mapeo de SECCIÓN: nombres que la IA podría haber embebido directamente
+# en HTML narrativo (resultados_valoracion, plan_estrategico, etc.) o
+# que produce el render legacy. Cubre además acentos y variantes con
+# dos puntos al final.
+HUMAN_SECTION_MAP = (
+    # Bloque "analisis_archivo_cliente"
+    ('Hallazgos principales',          'Aspectos observados durante la valoración'),
+    ('Hallazgos secundarios',          'Aspectos complementarios observados'),
+    ('Señales funcionales',            'Áreas que podrían beneficiarse de apoyo'),
+    ('Senales funcionales',            'Áreas que podrían beneficiarse de apoyo'),
+    ('Restricciones detectadas',       'Aspectos a tener presentes en el acompañamiento'),
+    ('Prioridades funcionales detectadas', 'Objetivos funcionales prioritarios'),
+    ('Prioridades detectadas',         'Objetivos funcionales prioritarios'),
+    ('Análisis del archivo del cliente', 'Lo que cuenta tu estudio'),
+    ('Analisis del archivo del cliente', 'Lo que cuenta tu estudio'),
+    ('Calidad del archivo',            ''),  # eliminado en renderers
+    # Bloque "prioridades_caso"
+    ('Evidencia (archivo)',            'Lo que se observa en el estudio'),
+    ('Evidencia',                      'Lo que se observa'),
+    ('Relación con antecedentes',      'Cómo se conecta con tu historia'),
+    ('Relacion con antecedentes',      'Cómo se conecta con tu historia'),
+    ('Importancia',                    'Por qué nos importa'),
+    # Encabezados de auditoría que la IA no debería emitir, pero por
+    # si filtra:
+    ('archivo_fue_analizado',          ''),
+    ('archivo NO analizado',           ''),
+    ('Archivo NO analizado',           ''),
+)
+
+
+# Reglas de suavizado del lenguaje IA (muletillas robóticas → naturales).
+# Se aplica DESPUÉS de la blacklist y los rewrites de label.
+# Cada par (regex, reemplazo); regex case-insensitive con boundary.
+SOFTENING_RULES = (
+    (r'\ben funci[oó]n de los datos analizados\b', 'según lo observado'),
+    (r'\bdatos analizados\b',          'lo observado'),
+    (r'\bbasado en el an[aá]lisis\b',  'a partir de lo observado'),
+    (r'\bcabe (destacar|mencionar|se[ñn]alar)\b', 'vale la pena destacar'),
+    (r'\bes importante notar que\b',   'también observamos que'),
+    (r'\bes importante destacar que\b', 'también vale la pena destacar que'),
+    # OJO: el reemplazo NO incluye coma — el regex consume la coma del
+    # original si está presente, así no se duplica.
+    (r'\ben conclusi[oó]n,?\s*',       'en suma, '),
+    (r'\bpor lo tanto,?\s*',           'por eso, '),
+    (r'\bdicho (esto|lo anterior)\b',  'con eso en mente'),
+    (r'\bse (recomienda|sugiere) (encarecidamente )?\b', 'te invitamos a '),
+    (r'\bal paciente\b',               'a ti'),
+    (r'\bel paciente\b',               'el cliente'),
+    (r'\bla paciente\b',               'la cliente'),
+    (r'\bcaso cl[ií]nico\b',           'acompañamiento personalizado'),
+    (r'\bcuadro cl[ií]nico\b',         'perfil funcional'),
+    # Conectores típicos IA
+    (r'\bcomo se mencion[oó] anteriormente\b', 'como vimos'),
+    (r'\bsuper[ií]or al rango normal\b',   'por encima del rango funcional'),
+    (r'\binferior al rango normal\b',      'por debajo del rango funcional'),
+    (r'\bfuera del rango normal\b',        'fuera del rango funcional'),
+)
+
+
+# Reglas de flujo emocional: normalizan el HTML/texto para que el PDF
+# se sienta más fluido y menos "QWeb administrativo".
+# Aplica al final del pipeline (después de humanize).
+EMOTIONAL_FLOW_RULES = (
+    # Triple+ salto de línea → doble (uniforme)
+    (r'\n{3,}', '\n\n'),
+    # Espacios múltiples NO dentro de tags → un solo espacio
+    (r' {2,}', ' '),
+    # "  ," / "  ." → ", " / ". "
+    (r'\s+([,.;:])', r'\1'),
+    # Dos puntos seguidos de salto y bullet → mantener prosa
+    (r':\s*<br/?>\s*', ': '),
+)
+
+
 # Tags HTML permitidos para preservar (resto se conserva textualmente
 # también — el renderer NO sanitiza HTML, sólo reemplaza tokens).
 _TAG_PATTERN = re.compile(r'<[^>]+>')
@@ -150,28 +228,56 @@ def _html_escape(text):
 # =====================================================================
 
 def humanize_text(text):
-    """Saneador wellness genérico.
+    """Saneador wellness genérico (Fase 4.2 + ampliado 4.3).
 
     Aplica, en orden:
       1) BLACKLIST_PHRASES (multi-palabra primero).
       2) BLACKLIST_WORDS (palabras sueltas con boundary).
-      3) LABEL_REWRITES (labels técnicos visibles → wellness).
+      3) LABEL_REWRITES (labels técnicos visibles → wellness, Fase 4.2).
+      4) HUMAN_SECTION_MAP (secciones IA → wellness, Fase 4.3).
+      5) SOFTENING_RULES (muletillas IA → naturales, Fase 4.3).
+      6) EMOTIONAL_FLOW_RULES (normalización de whitespace, Fase 4.3).
 
     Idempotente: humanize_text(humanize_text(x)) == humanize_text(x).
     Determinístico: mismo input → mismo output.
-    Preserva tags HTML simples (no se tocan, sólo el texto entre tags).
+    Preserva tags HTML simples (no parsea DOM; sólo reemplaza tokens).
     """
     if not text:
         return text or ''
     out = text
     out = _apply_replacements(out, BLACKLIST_PHRASES)
     out = _apply_replacements(out, BLACKLIST_WORDS)
-    # LABEL_REWRITES son strings literales (no regex). Conservamos case.
+    # LABEL_REWRITES y HUMAN_SECTION_MAP son strings literales.
     for legacy, wellness in LABEL_REWRITES:
         if not wellness:
-            continue  # eliminación se maneja en renderers, no aquí
+            continue
         out = out.replace(legacy, wellness)
+    for legacy, wellness in HUMAN_SECTION_MAP:
+        if not wellness:
+            # Eliminamos también el ':' colgante si existía
+            out = out.replace(legacy + ':', '')
+            out = out.replace(legacy, '')
+            continue
+        out = out.replace(legacy, wellness)
+    # SOFTENING_RULES son regex
+    out = _apply_replacements(out, SOFTENING_RULES)
+    # EMOTIONAL_FLOW_RULES son regex; reemplazo posicional sin case
+    for pattern, replacement in EMOTIONAL_FLOW_RULES:
+        out = re.sub(pattern, replacement, out)
     return out
+
+
+def humanize_narrative_field(html):
+    """Versión específica para campos HTML del cliente
+    (resultados_valoracion, plan_estrategico, resumen_estrategico,
+    resultados_esperados). Es equivalente a `humanize_text` pero la API
+    explícita ayuda a auditar las llamadas en `valoracion_valoracion.py`.
+
+    NO debe usarse sobre:
+      * advertencias (requisito legal: menciones literales).
+      * productos / dosis / cantidades (datos comerciales/numéricos).
+    """
+    return humanize_text(html or '')
 
 
 def humanize_html(html):

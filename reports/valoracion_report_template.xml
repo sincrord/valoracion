@@ -381,22 +381,26 @@
                         </div>
 
                         <!-- =========================================
-                             9. ADVERTENCIAS
+                             9. CONSIDERACIONES IMPORTANTES
+                                 (legalmente obligatorias — header con
+                                 tono wellness, contenido intacto)
                              ========================================= -->
-                        <h3 style="color: #E57373; border-bottom: 1px solid #E57373;
+                        <h3 style="color: #714B67; border-bottom: 1px solid #714B67;
                                    padding-bottom: 4px; margin-top: 20px;">
-                            ⚠ Advertencias
+                            Consideraciones importantes
                         </h3>
-                        <div style="font-size: 11px; background-color: #FFF3CD;
-                                    padding: 12px; border-left: 4px solid #E57373;">
+                        <div style="font-size: 11px; background-color: #FAF7F2;
+                                    padding: 14px 16px;
+                                    border-left: 3px solid #714B67;
+                                    border-radius: 2px;">
                             <t t-if="doc.advertencias">
                                 <div t-field="doc.advertencias"/>
                             </t>
                             <t t-else="">
                                 <p class="mb-0">
-                                    No se registraron advertencias específicas. Recuerda
-                                    que esta valoración es complementaria y no sustituye
-                                    consulta médica profesional.
+                                    Esta valoración es un acompañamiento funcional
+                                    y complementario; no sustituye la consulta con
+                                    un profesional de la salud.
                                 </p>
                             </t>
                         </div>
@@ -463,12 +467,7 @@
                             </p>
                             <p style="font-size: 10px; margin-bottom: 0;">
                                 <strong>
-                                    <span t-field="doc.company_id.name"/>
-                                    y el equipo emisor de esta valoración
-                                    no asumen responsabilidad por interpretaciones, decisiones
-                                    o consecuencias derivadas del uso o no uso de la
-                                    información aquí contenida sin acompañamiento profesional
-                                    adecuado.
+                                    <span t-field="doc.company_id.name"/><t t-esc="' '"/>y el equipo emisor de esta valoración no asumen responsabilidad por interpretaciones, decisiones o consecuencias derivadas del uso o no uso de la información aquí contenida sin acompañamiento profesional adecuado.
                                 </strong>
                             </p>
                             <p t-if="doc.consentimiento_cliente"
