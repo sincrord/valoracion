@@ -71,8 +71,14 @@
                                         <p style="margin: 8px 0 0 0;
                                                   font-size: 10px;
                                                   color: #5C5752;">
-                                            <span t-field="doc.fecha"
-                                                  t-options='{"format": "dd MMMM yyyy"}'/>
+                                            <t t-if="doc.date">
+                                                <span t-field="doc.date"
+                                                      t-options='{"format": "dd MMMM yyyy"}'/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="doc.create_date"
+                                                      t-options='{"format": "dd MMMM yyyy"}'/>
+                                            </t>
                                         </p>
                                     </td>
                                 </tr>
