@@ -235,6 +235,21 @@ class ResConfigSettings(models.TransientModel):
     # =========================================================
     # Narrative renderer (Fase 4.2 — modo wellness en el PDF)
     # =========================================================
+    valoracion_pdf_template = fields.Selection(
+        selection=[
+            ('legacy', 'Legacy (clásico)'),
+            ('premium', 'Premium wellness'),
+        ],
+        string='Plantilla del PDF cliente',
+        config_parameter='valoracion.pdf_template',
+        default='legacy',
+        help='Selector de la plantilla que usa el botón "Descargar PDF". '
+             'legacy: layout clásico (estable). premium: layout wellness '
+             'premium con cards, timeline y tipografía elegante. El cambio '
+             'es 100% reversible (volver a legacy desliga el premium '
+             'inmediatamente). No afecta motor v3 ni productos.',
+    )
+
     valoracion_narrative_mode = fields.Selection(
         selection=[
             ('legacy', 'Legacy (labels técnicos)'),

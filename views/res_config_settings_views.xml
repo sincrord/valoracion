@@ -43,6 +43,11 @@
                                  help="Selector de la capa narrativa del PDF cliente. legacy = bullets con labels técnicos ('Hallazgos principales', 'Evidencia', 'Importancia'). wellness = prosa humanizada con blacklist diagnóstica y vocabulario wellness premium. NO afecta motor v3 ni productos.">
                             <field name="valoracion_narrative_mode"/>
                         </setting>
+                        <setting id="pdf_template"
+                                 string="Plantilla del PDF cliente"
+                                 help="Selector del layout del PDF cliente. legacy = layout clásico (estable). premium = layout wellness premium con cards, timeline y tipografía elegante. Reversible al instante volviendo a legacy. No afecta motor v3 ni productos.">
+                            <field name="valoracion_pdf_template"/>
+                        </setting>
                     </block>
 
                     <block title="Claude (Anthropic)"

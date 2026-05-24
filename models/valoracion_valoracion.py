@@ -197,6 +197,30 @@ class Valoracion(models.Model):
              'Se preserva aunque cambie la versión global posteriormente '
              '(decisión C).',
     )
+    # Fase 4.4: render-time saneador para snapshots viejos que tienen el
+    # typo "carácterfuncional" (causa: legacy "<b> funcional" colapsado por
+    # wkhtmltopdf). NO se persiste — sólo se usa al renderizar el PDF.
+    consentimiento_texto_safe = fields.Html(
+        string='Consentimiento (render seguro)',
+        compute='_compute_consentimiento_texto_safe',
+        sanitize=False,
+        store=False,
+        help='Versión sanitizada del snapshot del consentimiento para el '
+             'render del PDF. Aplica un replace fijo de "carácterfuncional" '
+             '→ "carácter funcional". NO escribe en BD.',
+    )
+
+    @api.depends('consentimiento_texto')
+    def _compute_consentimiento_texto_safe(self):
+        for rec in self:
+            txt = rec.consentimiento_texto or ''
+            if txt:
+                # Cubre variantes del typo introducido por wkhtmltopdf al
+                # colapsar el espacio dentro de "<b> funcional".
+                txt = (txt
+                       .replace('carácterfuncional', 'carácter funcional')
+                       .replace('caracterfuncional', 'carácter funcional'))
+            rec.consentimiento_texto_safe = txt
 
     # ====================================================================
     # Datos del cliente (related, solo display)
@@ -2469,6 +2493,17 @@ class Valoracion(models.Model):
     # ====================================================================
     # Acciones: PDF / Cotización
     # ====================================================================
+    def _get_pdf_template_mode(self):
+        """Lee `valoracion.pdf_template` (legacy|premium, default legacy)
+        con normalización defensiva. Fase 4.4."""
+        try:
+            v = (self.env['ir.config_parameter'].sudo()
+                 .get_param('valoracion.pdf_template', 'legacy')
+                 or 'legacy')
+        except Exception:
+            return 'legacy'
+        return v if v in ('legacy', 'premium') else 'legacy'
+
     def action_descargar_pdf(self):
         """Genera y descarga el PDF de la valoración.
 
@@ -2477,7 +2512,11 @@ class Valoracion(models.Model):
         generado por IA antes de imprimir.
 
         Registra pdf_generated_at para auditoría. El reporte se define en
-        reports/valoracion_report.xml (XMLID action_report_valoracion).
+        reports/valoracion_report.xml (XMLID action_report_valoracion)
+        para el modo legacy, y reports/valoracion_report_premium_action.xml
+        (XMLID valoracion_report_premium) para el modo premium (Fase 4.4).
+        El dispatcher es defensivo: si premium no está disponible cae a
+        legacy sin romper la generación.
         """
         self.ensure_one()
         if self.state != 'generado':
@@ -2485,10 +2524,21 @@ class Valoracion(models.Model):
                 "La valoración debe estar en estado 'Generado' para descargar el PDF."
             ))
 
-        report = self.env.ref(
-            'valoracion.action_report_valoracion',
-            raise_if_not_found=False,
-        )
+        mode = self._get_pdf_template_mode()
+        report = None
+        if mode == 'premium':
+            report = self.env.ref(
+                'valoracion.valoracion_report_premium',
+                raise_if_not_found=False,
+            )
+            if not report:
+                _logger.warning(
+                    "PDF premium no disponible — fallback a legacy")
+        if not report:
+            report = self.env.ref(
+                'valoracion.action_report_valoracion',
+                raise_if_not_found=False,
+            )
         if not report:
             raise UserError(_(
                 "El reporte PDF no está disponible. Verifica que el módulo "
@@ -2497,7 +2547,9 @@ class Valoracion(models.Model):
 
         # Registrar timestamp de generación para auditoría
         self.sudo().write({'pdf_generated_at': fields.Datetime.now()})
-        self.message_post(body=_("Reporte PDF generado por %s.") % self.env.user.display_name)
+        self.message_post(body=_(
+            "Reporte PDF generado por %s (modo: %s).") % (
+            self.env.user.display_name, mode))
 
         return report.report_action(self)
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Fase 4.4 — Acción de reporte PDF Premium (Wellness).
+        XMLID: valoracion.valoracion_report_premium
+
+        Coexiste con el report legacy (valoracion.action_report_valoracion).
+        El dispatcher action_descargar_pdf() en valoracion.valoracion elige
+        cuál usar según el setting `valoracion.pdf_template`
+        (legacy|premium, default legacy).
+
+        Tanto este action como el legacy quedan registrados como
+        binding_model_id sobre valoracion.valoracion → ambos aparecen
+        en el menú "Print" estándar de Odoo para que el admin pueda
+        elegir manualmente. Default es legacy.
+    -->
+    <record id="valoracion_report_premium" model="ir.actions.report">
+        <field name="name">Valoración Wellness Premium</field>
+        <field name="model">valoracion.valoracion</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">valoracion.report_valoracion_premium_template</field>
+        <field name="report_file">valoracion.report_valoracion_premium_template</field>
+        <field name="print_report_name">'Valoracion_Premium_%s_%s' % ((object.name or 'sin_folio').replace('/', '_'), (object.partner_id.name or 'cliente').replace('/', '_').replace(' ', '_'))</field>
+        <field name="binding_model_id" ref="model_valoracion_valoracion"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+</odoo>

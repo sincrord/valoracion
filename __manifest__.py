@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Valoración',
-    'version': '18.0.3.3.0',
+    'version': '18.0.3.4.0',
     'category': 'Salud/Salud y Bienestar',
     'summary': 'Valoración funcional NeuroVital con apoyo de IA',
     'description': """
@@ -73,6 +73,9 @@ diagnóstico ni tratamiento médico profesional.
         # ===== Reportes =====
         'reports/valoracion_report.xml',
         'reports/valoracion_report_template.xml',
+        # Fase 4.4 — PDF Premium en paralelo (default sigue siendo legacy)
+        'reports/valoracion_report_premium_action.xml',
+        'reports/valoracion_report_template_premium.xml',
     ],
     'demo': [],
     'images': ['static/description/icon.png'],
