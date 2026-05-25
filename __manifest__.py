@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Valoración',
-    'version': '18.0.3.4.0',
+    'version': '18.0.3.4.1',
     'category': 'Salud/Salud y Bienestar',
     'summary': 'Valoración funcional NeuroVital con apoyo de IA',
     'description': """
