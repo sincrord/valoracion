@@ -23,6 +23,46 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
+                    <!--
+                        Fase 4.4.1 — control de saltos de página.
+                        Reglas compatibles con wkhtmltopdf 0.12.6.1
+                        (page-break-* legacy) + break-inside moderno
+                        como fallback para nuevos engines.
+                          .avoid-break       : ningún corte interno.
+                          .section-block     : bloque narrativo cohesivo;
+                                               evita cortar y permite
+                                               salto antes si no entra.
+                          .product-card      : card de producto; jamás
+                                               se parte y no fuerza salto.
+                          .signature-block   : consentimiento del cliente;
+                                               se mueve completo si no
+                                               cabe en la página actual.
+                    -->
+                    <style>
+                        .avoid-break {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .section-block {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            page-break-before: auto;
+                        }
+                        .product-card {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            page-break-after: auto;
+                        }
+                        .signature-block {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                            page-break-before: auto;
+                        }
+                        h2, h3, h4 {
+                            page-break-after: avoid;
+                            break-after: avoid-page;
+                        }
+                    </style>
                     <div class="page"
                          style="font-family: 'Helvetica', 'Arial', sans-serif;
                                 color: #2C2A29; line-height: 1.55;">
@@ -89,7 +129,8 @@
                              1. RESUMEN ESTRATÉGICO (si existe)
                              ============================================== -->
                         <t t-if="doc.resumen_estrategico">
-                            <div style="background-color: #FAF7F2;
+                            <div class="section-block avoid-break"
+                                 style="background-color: #FAF7F2;
                                         padding: 20px 22px; border-radius: 6px;
                                         margin-bottom: 28px;
                                         border-left: 3px solid #714B67;">
@@ -159,12 +200,12 @@
                                 Estimación mensual (30 días)
                             </p>
                             <t t-foreach="doc.linea_producto_ids" t-as="linea">
-                                <div style="border: 1px solid #E8E2D8;
+                                <div class="product-card avoid-break"
+                                     style="border: 1px solid #E8E2D8;
                                             border-radius: 6px;
                                             padding: 14px 18px;
                                             margin-bottom: 10px;
-                                            background-color: #FFFFFF;
-                                            page-break-inside: avoid;">
+                                            background-color: #FFFFFF;">
                                     <table style="width: 100%; border: none;
                                                   border-collapse: collapse;">
                                         <tr>
@@ -244,7 +285,8 @@
                             </t>
 
                             <!-- Total -->
-                            <div style="margin-top: 6px; padding: 12px 18px;
+                            <div class="avoid-break"
+                                 style="margin-top: 6px; padding: 12px 18px;
                                         background-color: #FAF7F2;
                                         border-radius: 6px; text-align: right;
                                         font-size: 12px;">
@@ -277,64 +319,70 @@
                              7. HÁBITOS COMPLEMENTARIOS
                              ============================================== -->
                         <t t-if="doc.habitos_complementarios">
-                            <h2 style="font-size: 18px; color: #714B67;
-                                       margin: 28px 0 12px 0; font-weight: 600;">
-                                Hábitos que apoyan tu plan
-                            </h2>
-                            <div style="font-size: 12px; color: #2C2A29;
-                                        margin-bottom: 20px;
-                                        padding: 16px 20px;
-                                        background-color: #FAF7F2;
-                                        border-radius: 6px;"
-                                 t-field="doc.habitos_complementarios"/>
+                            <div class="section-block">
+                                <h2 style="font-size: 18px; color: #714B67;
+                                           margin: 28px 0 12px 0; font-weight: 600;">
+                                    Hábitos que apoyan tu plan
+                                </h2>
+                                <div style="font-size: 12px; color: #2C2A29;
+                                            margin-bottom: 20px;
+                                            padding: 16px 20px;
+                                            background-color: #FAF7F2;
+                                            border-radius: 6px;"
+                                     t-field="doc.habitos_complementarios"/>
+                            </div>
                         </t>
 
                         <!-- ==============================================
                              8. RESULTADOS ESPERADOS
                              ============================================== -->
                         <t t-if="doc.resultados_esperados">
-                            <h2 style="font-size: 18px; color: #714B67;
-                                       margin: 28px 0 12px 0; font-weight: 600;">
-                                Qué puedes esperar
-                            </h2>
-                            <div style="font-size: 12px; color: #2C2A29;
-                                        margin-bottom: 20px;"
-                                 t-field="doc.resultados_esperados"/>
+                            <div class="section-block">
+                                <h2 style="font-size: 18px; color: #714B67;
+                                           margin: 28px 0 12px 0; font-weight: 600;">
+                                    Qué puedes esperar
+                                </h2>
+                                <div style="font-size: 12px; color: #2C2A29;
+                                            margin-bottom: 20px;"
+                                     t-field="doc.resultados_esperados"/>
+                            </div>
                         </t>
 
                         <!-- ==============================================
                              9. CONSIDERACIONES IMPORTANTES (legales)
                              ============================================== -->
-                        <h2 style="font-size: 16px; color: #714B67;
-                                   margin: 28px 0 10px 0; font-weight: 600;
-                                   page-break-before: auto;">
-                            Consideraciones importantes
-                        </h2>
-                        <div style="font-size: 11px; color: #2C2A29;
-                                    padding: 14px 16px;
-                                    background-color: #FAF7F2;
-                                    border-left: 3px solid #714B67;
-                                    border-radius: 2px;
-                                    margin-bottom: 20px;">
-                            <t t-if="doc.advertencias">
-                                <div t-field="doc.advertencias"/>
-                            </t>
-                            <t t-else="">
-                                <p style="margin: 0;">
-                                    Esta valoración es un acompañamiento funcional
-                                    y complementario; no sustituye la consulta con
-                                    un profesional de la salud.
-                                </p>
-                            </t>
+                        <div class="section-block">
+                            <h2 style="font-size: 16px; color: #714B67;
+                                       margin: 28px 0 10px 0; font-weight: 600;
+                                       page-break-before: auto;">
+                                Consideraciones importantes
+                            </h2>
+                            <div style="font-size: 11px; color: #2C2A29;
+                                        padding: 14px 16px;
+                                        background-color: #FAF7F2;
+                                        border-left: 3px solid #714B67;
+                                        border-radius: 2px;
+                                        margin-bottom: 20px;">
+                                <t t-if="doc.advertencias">
+                                    <div t-field="doc.advertencias"/>
+                                </t>
+                                <t t-else="">
+                                    <p style="margin: 0;">
+                                        Esta valoración es un acompañamiento funcional
+                                        y complementario; no sustituye la consulta con
+                                        un profesional de la salud.
+                                    </p>
+                                </t>
+                            </div>
                         </div>
 
                         <!-- ==============================================
                              10. CONSENTIMIENTO (snapshot SEGURO)
                              ============================================== -->
                         <div t-if="doc.consentimiento_cliente"
+                             class="signature-block"
                              style="margin-top: 24px; padding-top: 14px;
-                                    border-top: 1px solid #E8E2D8;
-                                    page-break-before: auto;">
+                                    border-top: 1px solid #E8E2D8;">
                             <p style="font-size: 9px; color: #A77E5C;
                                       letter-spacing: 1.5px;
                                       text-transform: uppercase;
@@ -355,7 +403,8 @@
                         <!-- ==============================================
                              FOOTER DISCRETO
                              ============================================== -->
-                        <div style="margin-top: 32px; padding-top: 14px;
+                        <div class="avoid-break"
+                             style="margin-top: 32px; padding-top: 14px;
                                     border-top: 1px solid #E8E2D8;
                                     font-size: 9px; color: #5C5752;
                                     text-align: center;">
