@@ -69,6 +69,30 @@
                             page-break-after: avoid;
                             break-after: avoid-page;
                         }
+                        /*
+                            Microfix 4.4.5: contenedor del logo del
+                            header premium. Compensa el whitespace
+                            transparente del PNG (el archivo puede traer
+                            padding interno) recortando con margin
+                            negativo controlado, y centra horizontalmente
+                            sin deformar. Compatible con wkhtmltopdf
+                            0.12.6.1 — sin flex/grid.
+                        */
+                        .premium-logo-wrap {
+                            text-align: center;
+                            margin: 0 auto;
+                            padding: 0;
+                            line-height: 0;
+                        }
+                        .premium-logo-wrap img {
+                            display: inline-block;
+                            max-height: 96px;
+                            height: auto;
+                            width: auto;
+                            max-width: 70%;
+                            vertical-align: middle;
+                            margin: 0 auto;
+                        }
                     </style>
                     <div class="page"
                          style="font-family: 'Helvetica', 'Arial', sans-serif;
@@ -77,14 +101,18 @@
                         <!-- ==============================================
                              HEADER — logo solo, centrado, minimalista.
                              Sin nombre/dirección/ciudad/país (4.4.4).
+                             Microfix 4.4.5: contenedor .premium-logo-wrap
+                             para tamaño nítido y proporcional. El padding
+                             se reparte equilibrado para que el logo NO
+                             quede desfasado hacia arriba, contemplando
+                             que el PNG puede traer whitespace transparente
+                             interno (no asumimos que sea del archivo).
                              ============================================== -->
-                        <div class="avoid-break"
-                             style="text-align: center;
-                                    padding: 6px 0 18px 0;">
+                        <div class="avoid-break premium-logo-wrap"
+                             style="padding: 16px 0 20px 0;">
                             <img t-if="doc.company_id.logo"
                                  t-att-src="'data:image/png;base64,%s' % doc.company_id.logo.decode('ascii') if doc.company_id.logo else False"
-                                 style="max-height: 52px; max-width: 200px;
-                                        opacity: 0.95;"/>
+                                 alt="Logo"/>
                         </div>
 
                         <!-- ==============================================
