@@ -35,7 +35,7 @@ import re
 import unicodedata
 
 
-VERSION = '4.4.0'
+VERSION = '4.4.1'
 
 
 # =====================================================================
@@ -335,31 +335,48 @@ def render_analisis_narrative(analisis):
 
     if hp or hs or sf:
         parts.append(
-            '<p style="margin-top:0;">El estudio deja ver algunas '
+            '<p style="margin:0 0 14px 0;">El estudio deja ver algunas '
             'señales que vale la pena acompañar:</p>'
         )
 
-    def _bullets(items, intro=None):
+    def _chips(items, intro=None):
+        """Fase 4.4.4: reemplazo de <ul><li> por una sección con
+        encabezado wellness en mayúsculas pequeñas + cada hallazgo
+        como "chip" suave en línea separada. Menos checklist técnico,
+        más boutique."""
         if not items:
             return
         if intro:
-            parts.append('<p style="margin:10px 0 2px 0;color:#5C5752;'
-                         'font-style:italic;">%s</p>'
-                         % _html_escape(intro))
-        parts.append('<ul style="margin-top:0;margin-bottom:6px;">')
+            parts.append(
+                '<p style="margin:14px 0 8px 0;'
+                'color:#A77E5C;'
+                'text-transform:uppercase;'
+                'letter-spacing:1.8px;'
+                'font-size:10px;'
+                'font-weight:500;">%s</p>'
+                % _html_escape(intro)
+            )
         for it in items:
-            parts.append('<li>%s</li>'
-                         % humanize_text(_html_escape(str(it))))
-        parts.append('</ul>')
+            parts.append(
+                '<p style="margin:0 0 6px 0;'
+                'padding:7px 12px;'
+                'background-color:#FCFAF7;'
+                'border-left:2px solid #A77E5C;'
+                'border-radius:0 4px 4px 0;'
+                'font-size:11px;'
+                'color:#2C2A29;'
+                'line-height:1.5;">%s</p>'
+                % humanize_text(_html_escape(str(it)))
+            )
 
-    # Intros más cálidas y variadas (menos plantilla)
-    _bullets(hp, 'Lo más destacado')
-    _bullets(hs, 'También llaman la atención')
-    _bullets(sf, 'Cómo se está sintiendo el cuerpo')
+    # Fase 4.4.4: copy más wellness/boutique
+    _chips(hp,  'Lo que el cuerpo está expresando')
+    _chips(hs,  'Aspectos que vale la pena acompañar')
+    _chips(sf,  'Señales de bienestar')
     if rd:
-        _bullets(rd, 'A tener presente en el acompañamiento')
+        _chips(rd, 'Aspectos importantes para tu acompañamiento')
     if pd_:
-        _bullets(pd_, 'Áreas que pediría apoyo integral')
+        _chips(pd_, 'Áreas prioritarias para fortalecer')
 
     return ''.join(parts)
 
