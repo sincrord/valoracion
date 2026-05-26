@@ -998,8 +998,10 @@ class Valoracion(models.Model):
                     "Proveedor IA desconocido: '%s'. Valores válidos: 'claude', 'openai'."
                 ) % proveedor_label)
         except IAProviderConfigError as e:
-            # Error de configuración temprana (api_key vacía o modelo vacío)
-            self.env['valoracion.log.ia'].create({
+            # Error de configuración temprana (api_key vacía o modelo vacío).
+            # Fase 5: sudo() controlado — el log es escritura técnica del
+            # sistema, no de UI. user_id explícito preserva trazabilidad.
+            self.env['valoracion.log.ia'].sudo().create({
                 'valoracion_id': self.id,
                 'user_id': self.env.user.id,
                 'proveedor': proveedor_label,
@@ -1138,7 +1140,10 @@ class Valoracion(models.Model):
         if audit_data.get('avisos_fuentes'):
             truncado_detalle_parts.append(audit_data['avisos_fuentes'])
 
-        self.env['valoracion.log.ia'].create({
+        # Fase 5: sudo() controlado para que la generación funcione con
+        # usuarios sin perm_create sobre valoracion.log.ia. Trazabilidad
+        # preservada mediante user_id explícito.
+        self.env['valoracion.log.ia'].sudo().create({
             'valoracion_id': self.id,
             'user_id': self.env.user.id,
             'proveedor': provider.name,

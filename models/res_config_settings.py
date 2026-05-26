@@ -223,7 +223,7 @@ class ResConfigSettings(models.TransientModel):
         ],
         string='Motor BioCuántico',
         config_parameter='valoracion.biocuantico_motor_version',
-        default='legacy',
+        default='v3',  # Fase 5: productivo. Rollback con setting → 'legacy'.
         help='Selecciona qué motor BioCuántico usa el parser de archivos. '
              'legacy: parser actual (estable). v3: pipeline puro nuevo '
              '(extractor → classifier → severity → ranker → master_summary). '
@@ -242,7 +242,7 @@ class ResConfigSettings(models.TransientModel):
         ],
         string='Plantilla del PDF cliente',
         config_parameter='valoracion.pdf_template',
-        default='legacy',
+        default='premium',  # Fase 5: productivo. Rollback con setting.
         help='Selector de la plantilla que usa el botón "Descargar PDF". '
              'legacy: layout clásico (estable). premium: layout wellness '
              'premium con cards, timeline y tipografía elegante. El cambio '
@@ -257,7 +257,7 @@ class ResConfigSettings(models.TransientModel):
         ],
         string='Modo de narrativa del PDF',
         config_parameter='valoracion.narrative_mode',
-        default='legacy',
+        default='wellness',  # Fase 5: productivo. Rollback con setting.
         help='Controla cómo se renderizan las secciones analisis_archivo '
              'y prioridades_caso en el PDF cliente. legacy: bullets con '
              'labels como "Hallazgos principales", "Evidencia (archivo)", '

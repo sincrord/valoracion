@@ -2,27 +2,32 @@
 <odoo>
 
     <!--
-        Acción de reporte para valoración.
+        Acción de reporte para valoración (legacy).
         XMLID: valoracion.action_report_valoracion
-        Esta XMLID es la que valoracion_valoracion.action_descargar_pdf
-        referencia con env.ref(...) para disparar el reporte.
 
-        binding_model_id + binding_type='report' añaden la opción
-        "Imprimir → Valoración Funcional VitalHealth" en el menú del registro.
+        Fase 5 — hardening productivo:
+          El binding al modelo (Print menu) se elimina: con el toggle
+          `valoracion.pdf_template` (default premium en instalaciones
+          nuevas) el dispatcher action_descargar_pdf elige cuál reporte
+          usar. Mantener ambos en el menú Print confundía al asesor.
+
+        El action SIGUE existiendo (rollback inmediato):
+          - env.ref('valoracion.action_report_valoracion') sigue resolviendo.
+          - El dispatcher lo invoca cuando pdf_template=legacy.
+          - El template legacy `report_valoracion_template` sigue intacto.
+          - No se rompe ningún test ni XMLID externo.
 
         print_report_name define el nombre sugerido del archivo PDF al
-        descargar, sustituyendo '/' del folio por '_' para que el sistema
-        operativo lo acepte como nombre de archivo.
+        descargar.
     -->
     <record id="action_report_valoracion" model="ir.actions.report">
-        <field name="name">Valoración Funcional VitalHealth</field>
+        <field name="name">Valoración Funcional VitalHealth (clásica)</field>
         <field name="model">valoracion.valoracion</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">valoracion.report_valoracion_template</field>
         <field name="report_file">valoracion.report_valoracion_template</field>
         <field name="print_report_name">'Valoracion_%s_%s' % ((object.name or 'sin_folio').replace('/', '_'), (object.partner_id.name or 'cliente').replace('/', '_').replace(' ', '_'))</field>
-        <field name="binding_model_id" ref="model_valoracion_valoracion"/>
-        <field name="binding_type">report</field>
+        <!-- binding eliminado en Fase 5 — invisible en Print menu -->
         <field name="paperformat_id" ref="base.paperformat_euro"/>
     </record>
 

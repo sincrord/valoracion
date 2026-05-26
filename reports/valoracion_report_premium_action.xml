@@ -15,7 +15,7 @@
         elegir manualmente. Default es legacy.
     -->
     <record id="valoracion_report_premium" model="ir.actions.report">
-        <field name="name">Valoración Wellness Premium</field>
+        <field name="name">Valoración Wellness</field>
         <field name="model">valoracion.valoracion</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">valoracion.report_valoracion_premium_template</field>
