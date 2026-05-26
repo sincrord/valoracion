@@ -75,68 +75,91 @@
                                 color: #2C2A29; line-height: 1.55;">
 
                         <!-- ==============================================
-                             HEADER — logo centrado solo (sin texto admin)
-                             Fase 4.4.4: eliminado nombre de empresa,
-                             dirección, ciudad, país. El logo basta.
+                             HEADER — logo solo, centrado, minimalista.
+                             Sin nombre/dirección/ciudad/país (4.4.4).
                              ============================================== -->
                         <div class="avoid-break"
                              style="text-align: center;
-                                    padding: 8px 0 28px 0;">
+                                    padding: 6px 0 18px 0;">
                             <img t-if="doc.company_id.logo"
                                  t-att-src="'data:image/png;base64,%s' % doc.company_id.logo.decode('ascii') if doc.company_id.logo else False"
-                                 style="max-height: 56px; max-width: 220px;
+                                 style="max-height: 52px; max-width: 200px;
                                         opacity: 0.95;"/>
                         </div>
 
                         <!-- ==============================================
-                             PORTADA — cliente protagonista
+                             PORTADA — equilibrio visual 4.4.3 restaurado.
+                             Cliente prominente + folio/fecha estructurados
+                             (en lugar de la versión minimalista vacía
+                             de 4.4.4).
                              ============================================== -->
                         <div class="avoid-break"
-                             style="padding: 18px 0 30px 0;
-                                    margin-bottom: 18px;
-                                    text-align: center;">
-                            <p style="font-size: 9px; letter-spacing: 3px;
+                             style="padding: 16px 0 22px 0;
+                                    border-bottom: 1px solid #E8E2D8;
+                                    margin-bottom: 26px;">
+                            <p style="font-size: 10px; letter-spacing: 2.5px;
                                       color: #A77E5C; text-transform: uppercase;
-                                      margin: 0 0 22px 0; font-weight: 500;">
-                                Valoración funcional · acompañamiento integral
+                                      margin: 0 0 10px 0; font-weight: 500;">
+                                Valoración funcional · VitalHealth
                             </p>
-                            <p style="font-size: 12px; color: #5C5752;
-                                      margin: 0 0 8px 0; letter-spacing: 0.3px;
-                                      font-style: italic;">
-                                Preparado para
-                            </p>
-                            <h1 style="font-size: 30px; color: #2C2A29;
-                                       margin: 0 0 28px 0; font-weight: 500;
-                                       letter-spacing: -0.4px;
-                                       line-height: 1.2;">
-                                <span t-field="doc.partner_id.name"/>
+                            <h1 style="font-size: 30px; color: #714B67;
+                                       margin: 0 0 8px 0; font-weight: 600;
+                                       letter-spacing: -0.6px;
+                                       line-height: 1.15;">
+                                Tu acompañamiento integral
                             </h1>
-                            <p style="font-size: 10px; color: #A77E5C;
-                                      letter-spacing: 1.5px;
-                                      text-transform: uppercase;
-                                      margin: 0;
-                                      font-weight: 400;">
-                                <t t-if="doc.date">
-                                    <span t-field="doc.date"
-                                          t-options='{"format": "dd · MMMM · yyyy"}'/>
-                                </t>
-                                <t t-else="">
-                                    <span t-field="doc.create_date"
-                                          t-options='{"format": "dd · MMMM · yyyy"}'/>
-                                </t>
-                                <span style="color: #E8E2D8; margin: 0 8px;">|</span>
-                                <span style="color: #5C5752; font-weight: 400;">
-                                    <span t-field="doc.name"/>
-                                </span>
+                            <p style="font-size: 22px; color: #2C2A29;
+                                      margin: 0 0 18px 0; font-weight: 500;
+                                      letter-spacing: -0.3px;
+                                      line-height: 1.25;">
+                                <span t-field="doc.partner_id.name"/>
                             </p>
-                        </div>
-
-                        <!-- separador suave wellness -->
-                        <div style="text-align: center; margin: 0 0 26px 0;">
-                            <span style="display: inline-block;
-                                         width: 40px; height: 1px;
-                                         background-color: #A77E5C;
-                                         opacity: 0.6;">·</span>
+                            <table style="width: 100%; border: none;
+                                          border-collapse: collapse;
+                                          margin-top: 4px;">
+                                <tr>
+                                    <td style="border: none; padding: 0;
+                                               vertical-align: top;
+                                               font-size: 10px; color: #A77E5C;
+                                               letter-spacing: 1.5px;
+                                               text-transform: uppercase;">
+                                        Folio
+                                        <span style="display: block;
+                                                     margin-top: 4px;
+                                                     font-size: 12px;
+                                                     color: #2C2A29;
+                                                     letter-spacing: 0;
+                                                     text-transform: none;
+                                                     font-weight: 600;">
+                                            <span t-field="doc.name"/>
+                                        </span>
+                                    </td>
+                                    <td style="border: none; padding: 0;
+                                               vertical-align: top;
+                                               text-align: right;
+                                               font-size: 10px; color: #A77E5C;
+                                               letter-spacing: 1.5px;
+                                               text-transform: uppercase;">
+                                        Fecha
+                                        <span style="display: block;
+                                                     margin-top: 4px;
+                                                     font-size: 12px;
+                                                     color: #2C2A29;
+                                                     letter-spacing: 0;
+                                                     text-transform: none;
+                                                     font-weight: 500;">
+                                            <t t-if="doc.date">
+                                                <span t-field="doc.date"
+                                                      t-options='{"format": "dd MMMM yyyy"}'/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="doc.create_date"
+                                                      t-options='{"format": "dd MMMM yyyy"}'/>
+                                            </t>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
 
                         <!-- ==============================================
@@ -425,25 +448,23 @@
                              ============================================== -->
                         <div t-if="doc.consentimiento_cliente"
                              class="signature-block"
-                             style="margin-top: 32px; padding: 20px 22px 18px 22px;
+                             style="margin-top: 28px; padding: 18px 20px;
                                     border-top: 1px solid #E8E2D8;
                                     background-color: #FCFAF7;
-                                    border-radius: 0 0 8px 8px;">
-                            <p style="font-size: 8.5px; color: #A77E5C;
-                                      letter-spacing: 2.2px;
+                                    border-radius: 0 0 6px 6px;">
+                            <p style="font-size: 9px; color: #A77E5C;
+                                      letter-spacing: 1.8px;
                                       text-transform: uppercase;
-                                      margin: 0 0 14px 0;
+                                      margin: 0 0 12px 0;
                                       font-weight: 500;">
                                 Consentimiento informado
                             </p>
-                            <div style="font-size: 9.5px; color: #5C5752;
-                                        line-height: 1.75;
-                                        letter-spacing: 0.1px;"
+                            <div style="font-size: 10px; color: #5C5752;
+                                        line-height: 1.7;"
                                  t-field="doc.consentimiento_texto_safe"/>
-                            <p style="font-size: 8.5px; color: #A77E5C;
+                            <p style="font-size: 9px; color: #A77E5C;
                                       font-style: italic;
-                                      margin: 16px 0 0 0;
-                                      letter-spacing: 0.2px;">
+                                      margin: 14px 0 0 0;">
                                 Registrado el
                                 <span t-field="doc.consentimiento_fecha"
                                       t-options='{"format": "dd/MM/yyyy HH:mm"}'/>.
