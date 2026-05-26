@@ -68,49 +68,63 @@
                                 color: #2C2A29; line-height: 1.55;">
 
                         <!-- ==============================================
-                             PORTADA
+                             PORTADA — premium wellness
                              ============================================== -->
-                        <div style="padding: 32px 0 24px 0;
+                        <div class="avoid-break"
+                             style="padding: 20px 0 22px 0;
                                     border-bottom: 1px solid #E8E2D8;
-                                    margin-bottom: 28px;">
-                            <p style="font-size: 11px; letter-spacing: 2px;
+                                    margin-bottom: 26px;">
+                            <p style="font-size: 10px; letter-spacing: 2.5px;
                                       color: #A77E5C; text-transform: uppercase;
-                                      margin: 0 0 6px 0;">
-                                Valoración funcional VitalHealth
+                                      margin: 0 0 10px 0; font-weight: 500;">
+                                Valoración funcional · VitalHealth
                             </p>
-                            <h1 style="font-size: 28px; color: #714B67;
-                                       margin: 0 0 14px 0; font-weight: 600;
-                                       letter-spacing: -0.5px;">
+                            <h1 style="font-size: 30px; color: #714B67;
+                                       margin: 0 0 8px 0; font-weight: 600;
+                                       letter-spacing: -0.6px;
+                                       line-height: 1.15;">
                                 Tu acompañamiento integral
                             </h1>
+                            <p style="font-size: 22px; color: #2C2A29;
+                                      margin: 0 0 18px 0; font-weight: 500;
+                                      letter-spacing: -0.3px;
+                                      line-height: 1.25;">
+                                <span t-field="doc.partner_id.name"/>
+                            </p>
                             <table style="width: 100%; border: none;
-                                          margin-top: 12px;">
+                                          border-collapse: collapse;
+                                          margin-top: 4px;">
                                 <tr>
                                     <td style="border: none; padding: 0;
                                                vertical-align: top;
-                                               font-size: 11px; color: #5C5752;">
-                                        <p style="margin: 0;">Preparado para</p>
-                                        <p style="margin: 4px 0 0 0;
-                                                  font-size: 14px;
-                                                  color: #2C2A29;
-                                                  font-weight: 600;">
-                                            <span t-field="doc.partner_id.name"/>
-                                        </p>
+                                               font-size: 10px; color: #A77E5C;
+                                               letter-spacing: 1.5px;
+                                               text-transform: uppercase;">
+                                        Folio
+                                        <span style="display: block;
+                                                     margin-top: 4px;
+                                                     font-size: 12px;
+                                                     color: #2C2A29;
+                                                     letter-spacing: 0;
+                                                     text-transform: none;
+                                                     font-weight: 600;">
+                                            <span t-field="doc.name"/>
+                                        </span>
                                     </td>
                                     <td style="border: none; padding: 0;
                                                vertical-align: top;
                                                text-align: right;
-                                               font-size: 11px; color: #5C5752;">
-                                        <p style="margin: 0;">Folio</p>
-                                        <p style="margin: 4px 0 0 0;
-                                                  font-size: 13px;
-                                                  color: #2C2A29;
-                                                  font-weight: 600;">
-                                            <span t-field="doc.name"/>
-                                        </p>
-                                        <p style="margin: 8px 0 0 0;
-                                                  font-size: 10px;
-                                                  color: #5C5752;">
+                                               font-size: 10px; color: #A77E5C;
+                                               letter-spacing: 1.5px;
+                                               text-transform: uppercase;">
+                                        Fecha
+                                        <span style="display: block;
+                                                     margin-top: 4px;
+                                                     font-size: 12px;
+                                                     color: #2C2A29;
+                                                     letter-spacing: 0;
+                                                     text-transform: none;
+                                                     font-weight: 500;">
                                             <t t-if="doc.date">
                                                 <span t-field="doc.date"
                                                       t-options='{"format": "dd MMMM yyyy"}'/>
@@ -119,7 +133,7 @@
                                                 <span t-field="doc.create_date"
                                                       t-options='{"format": "dd MMMM yyyy"}'/>
                                             </t>
-                                        </p>
+                                        </span>
                                     </td>
                                 </tr>
                             </table>
@@ -149,8 +163,9 @@
                              (analisis + resultados_valoracion narrativos)
                              ============================================== -->
                         <t t-if="doc.resultados_valoracion">
-                            <h2 style="font-size: 18px; color: #714B67;
-                                       margin: 28px 0 12px 0; font-weight: 600;">
+                            <h2 style="font-size: 17px; color: #714B67;
+                                       margin: 22px 0 10px 0; font-weight: 600;
+                                       letter-spacing: -0.2px;">
                                 Lo que cuenta tu estudio
                             </h2>
                             <div style="font-size: 12px; color: #2C2A29;
@@ -162,8 +177,9 @@
                              3. ÁREAS PRIORITARIAS (cards)
                              ============================================== -->
                         <t t-if="doc.prioridades_caso">
-                            <h2 style="font-size: 18px; color: #714B67;
-                                       margin: 28px 0 14px 0; font-weight: 600;">
+                            <h2 style="font-size: 17px; color: #714B67;
+                                       margin: 22px 0 12px 0; font-weight: 600;
+                                       letter-spacing: -0.2px;">
                                 Áreas prioritarias para tu acompañamiento
                             </h2>
                             <div style="border: 1px solid #E8E2D8;
@@ -178,8 +194,9 @@
                              4. PLAN FUNCIONAL (prosa)
                              ============================================== -->
                         <t t-if="doc.plan_estrategico">
-                            <h2 style="font-size: 18px; color: #714B67;
-                                       margin: 28px 0 12px 0; font-weight: 600;">
+                            <h2 style="font-size: 17px; color: #714B67;
+                                       margin: 22px 0 10px 0; font-weight: 600;
+                                       letter-spacing: -0.2px;">
                                 Tu plan funcional
                             </h2>
                             <div style="font-size: 12px; color: #2C2A29;
@@ -191,8 +208,9 @@
                              5. PRODUCTOS RECOMENDADOS (cards apiladas)
                              ============================================== -->
                         <t t-if="doc.linea_producto_ids">
-                            <h2 style="font-size: 18px; color: #714B67;
-                                       margin: 28px 0 8px 0; font-weight: 600;">
+                            <h2 style="font-size: 17px; color: #714B67;
+                                       margin: 22px 0 6px 0; font-weight: 600;
+                                       letter-spacing: -0.2px;">
                                 Productos VitalHealth para acompañarte
                             </h2>
                             <p style="font-size: 10px; color: #A77E5C;
@@ -202,34 +220,38 @@
                             <t t-foreach="doc.linea_producto_ids" t-as="linea">
                                 <div class="product-card avoid-break"
                                      style="border: 1px solid #E8E2D8;
-                                            border-radius: 6px;
-                                            padding: 14px 18px;
-                                            margin-bottom: 10px;
+                                            border-radius: 8px;
+                                            padding: 16px 20px 14px 20px;
+                                            margin-bottom: 12px;
                                             background-color: #FFFFFF;">
+                                    <!-- Header: badge + nombre del producto -->
                                     <table style="width: 100%; border: none;
-                                                  border-collapse: collapse;">
+                                                  border-collapse: collapse;
+                                                  margin-bottom: 6px;">
                                         <tr>
                                             <td style="border: none; padding: 0;
-                                                       vertical-align: top;
-                                                       width: 36px;">
+                                                       vertical-align: middle;
+                                                       width: 34px;">
                                                 <div style="background-color: #714B67;
                                                             color: #FFFFFF;
-                                                            width: 26px; height: 26px;
+                                                            width: 24px; height: 24px;
                                                             border-radius: 50%;
                                                             text-align: center;
-                                                            font-size: 11px;
-                                                            line-height: 26px;
-                                                            font-weight: 600;">
+                                                            font-size: 10px;
+                                                            line-height: 24px;
+                                                            font-weight: 600;
+                                                            letter-spacing: 0.3px;">
                                                     <span t-esc="linea_index + 1"/>
                                                 </div>
                                             </td>
                                             <td style="border: none; padding: 0;
-                                                       vertical-align: top;">
+                                                       vertical-align: middle;">
                                                 <t t-if="linea.product_id">
                                                     <p style="margin: 0;
                                                               font-size: 13px;
                                                               color: #2C2A29;
-                                                              font-weight: 600;">
+                                                              font-weight: 600;
+                                                              letter-spacing: -0.1px;">
                                                         <span t-field="linea.product_id.display_name"/>
                                                     </p>
                                                 </t>
@@ -242,67 +264,88 @@
                                                         — no encontrado en catálogo
                                                     </p>
                                                 </t>
-                                                <p t-if="linea.dosis_sugerida"
-                                                   style="margin: 4px 0 0 0;
-                                                          font-size: 10px;
-                                                          color: #5C5752;
-                                                          font-style: italic;">
-                                                    <span t-esc="linea.dosis_sugerida"/>
-                                                </p>
-                                                <p t-if="linea.razon"
-                                                   style="margin: 8px 0 0 0;
-                                                          font-size: 11px;
-                                                          color: #2C2A29;">
-                                                    <span t-esc="linea.razon"/>
-                                                </p>
-                                            </td>
-                                            <td style="border: none; padding: 0;
-                                                       vertical-align: top;
-                                                       text-align: right;
-                                                       white-space: nowrap;
-                                                       font-size: 11px;
-                                                       color: #5C5752;">
-                                                <p style="margin: 0;">
-                                                    Cantidad:
-                                                    <strong style="color: #2C2A29;">
-                                                        <span t-esc="linea.cantidad"
-                                                              t-options='{"widget": "float", "precision": 2}'/>
-                                                    </strong>
-                                                </p>
-                                                <t t-if="linea.product_id">
-                                                    <p style="margin: 4px 0 0 0;">
-                                                        Subtotal:
-                                                        <strong style="color: #714B67;">
-                                                            <span t-field="linea.subtotal"
-                                                                  t-options='{"widget": "monetary", "display_currency": linea.currency_id}'/>
-                                                        </strong>
-                                                    </p>
-                                                </t>
                                             </td>
                                         </tr>
                                     </table>
+
+                                    <!-- Dosis sugerida (subtítulo discreto) -->
+                                    <p t-if="linea.dosis_sugerida"
+                                       style="margin: 0 0 0 34px;
+                                              font-size: 10px;
+                                              color: #A77E5C;
+                                              font-style: italic;
+                                              letter-spacing: 0.1px;">
+                                        <span t-esc="linea.dosis_sugerida"/>
+                                    </p>
+
+                                    <!-- Razón funcional (prosa) -->
+                                    <p t-if="linea.razon"
+                                       style="margin: 8px 0 10px 34px;
+                                              font-size: 11px;
+                                              color: #2C2A29;
+                                              line-height: 1.55;">
+                                        <span t-esc="linea.razon"/>
+                                    </p>
+
+                                    <!-- Footer card: cantidad + subtotal,
+                                         peso visual más bajo. -->
+                                    <div style="margin: 8px 0 0 34px;
+                                                padding-top: 8px;
+                                                border-top: 1px dashed #E8E2D8;
+                                                font-size: 10px;
+                                                color: #5C5752;
+                                                letter-spacing: 0.2px;">
+                                        <span>
+                                            Cantidad:
+                                            <span style="color: #2C2A29;
+                                                         font-weight: 500;">
+                                                <span t-esc="linea.cantidad"
+                                                      t-options='{"widget": "float", "precision": 2}'/>
+                                            </span>
+                                        </span>
+<!-- Se deja de mostrar en el reporte el precio
+                                        <t t-if="linea.product_id">
+                                            <span style="margin-left: 14px;
+                                                         color: #A77E5C;">·</span>
+                                            <span style="margin-left: 14px;">
+                                                Subtotal:
+                                                <span style="color: #714B67;
+                                                             font-weight: 600;">
+                                                    <span t-field="linea.subtotal"
+                                                          t-options='{"widget": "monetary", "display_currency": linea.currency_id}'/>
+                                                </span>
+                                            </span>
+                                        </t>            -->
+                                    </div>
                                 </div>
                             </t>
 
-                            <!-- Total -->
+                            <!-- Total estimado mensual — peso visual sutil 
                             <div class="avoid-break"
-                                 style="margin-top: 6px; padding: 12px 18px;
+                                 style="margin-top: 10px; padding: 12px 20px;
                                         background-color: #FAF7F2;
-                                        border-radius: 6px; text-align: right;
-                                        font-size: 12px;">
+                                        border-radius: 8px;
+                                        text-align: right;
+                                        font-size: 11px;
+                                        letter-spacing: 0.2px;">
                                 <t t-set="total_estimado"
                                    t-value="sum(doc.linea_producto_ids.mapped('subtotal'))"/>
                                 <t t-set="total_currency"
                                    t-value="doc.linea_producto_ids[:1].currency_id or doc.company_id.currency_id"/>
-                                <span style="color: #5C5752;">
-                                    Estimado mensual:
+                                <span style="color: #A77E5C;
+                                             text-transform: uppercase;
+                                             letter-spacing: 1.5px;
+                                             font-size: 9px;">
+                                    Estimado mensual
                                 </span>
-                                <strong style="color: #714B67; font-size: 14px;
-                                               margin-left: 6px;">
+                                <span style="color: #714B67;
+                                             font-size: 15px;
+                                             font-weight: 600;
+                                             margin-left: 10px;">
                                     <span t-esc="total_estimado"
                                           t-options='{"widget": "monetary", "display_currency": total_currency}'/>
-                                </strong>
-                            </div>
+                                </span>
+                            </div>      -->
                         </t>
 
                         <!-- ==============================================
@@ -352,8 +395,9 @@
                              9. CONSIDERACIONES IMPORTANTES (legales)
                              ============================================== -->
                         <div class="section-block">
-                            <h2 style="font-size: 16px; color: #714B67;
-                                       margin: 28px 0 10px 0; font-weight: 600;
+                            <h2 style="font-size: 15px; color: #714B67;
+                                       margin: 22px 0 10px 0; font-weight: 600;
+                                       letter-spacing: -0.1px;
                                        page-break-before: auto;">
                                 Consideraciones importantes
                             </h2>
@@ -381,19 +425,23 @@
                              ============================================== -->
                         <div t-if="doc.consentimiento_cliente"
                              class="signature-block"
-                             style="margin-top: 24px; padding-top: 14px;
-                                    border-top: 1px solid #E8E2D8;">
+                             style="margin-top: 28px; padding: 18px 20px;
+                                    border-top: 1px solid #E8E2D8;
+                                    background-color: #FCFAF7;
+                                    border-radius: 0 0 6px 6px;">
                             <p style="font-size: 9px; color: #A77E5C;
-                                      letter-spacing: 1.5px;
+                                      letter-spacing: 1.8px;
                                       text-transform: uppercase;
-                                      margin: 0 0 8px 0;">
+                                      margin: 0 0 12px 0;
+                                      font-weight: 500;">
                                 Consentimiento informado
                             </p>
                             <div style="font-size: 10px; color: #5C5752;
-                                        line-height: 1.5;"
+                                        line-height: 1.7;"
                                  t-field="doc.consentimiento_texto_safe"/>
-                            <p style="font-size: 9px; color: #5C5752;
-                                      font-style: italic; margin: 10px 0 0 0;">
+                            <p style="font-size: 9px; color: #A77E5C;
+                                      font-style: italic;
+                                      margin: 14px 0 0 0;">
                                 Registrado el
                                 <span t-field="doc.consentimiento_fecha"
                                       t-options='{"format": "dd/MM/yyyy HH:mm"}'/>.
@@ -401,25 +449,26 @@
                         </div>
 
                         <!-- ==============================================
-                             FOOTER DISCRETO
+                             FOOTER — minimalista y respirado
                              ============================================== -->
                         <div class="avoid-break"
-                             style="margin-top: 32px; padding-top: 14px;
+                             style="margin-top: 36px; padding-top: 18px;
                                     border-top: 1px solid #E8E2D8;
-                                    font-size: 9px; color: #5C5752;
                                     text-align: center;">
-                            <p style="margin: 0;">
-                                <strong style="color: #714B67;">
-                                    <span t-field="doc.company_id.name"/>
-                                </strong>
-                                · acompañamiento funcional complementario
-                                · no sustituye atención profesional
+                            <p style="margin: 0;
+                                      font-size: 11px;
+                                      color: #714B67;
+                                      font-weight: 600;
+                                      letter-spacing: 0.2px;">
+                                <span t-field="doc.company_id.name"/>
                             </p>
-                            <p style="margin: 6px 0 0 0; color: #A77E5C;
-                                      letter-spacing: 1.5px;
+                            <p style="margin: 10px 0 0 0;
+                                      color: #A77E5C;
+                                      letter-spacing: 2.2px;
                                       text-transform: uppercase;
-                                      font-size: 8px;">
-                                Valoración funcional VitalHealth
+                                      font-size: 8px;
+                                      font-weight: 500;">
+                                Acompañamiento funcional · VitalHealth
                             </p>
                         </div>
 

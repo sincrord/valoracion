@@ -35,7 +35,7 @@ import re
 import unicodedata
 
 
-VERSION = '4.3.0'
+VERSION = '4.4.0'
 
 
 # =====================================================================
@@ -309,10 +309,10 @@ def render_analisis_narrative(analisis):
         return ''
 
     parts = []
-    parts.append(
-        '<h4 style="color:#714B67;margin-bottom:6px;">'
-        'Lo que cuenta tu estudio</h4>'
-    )
+    # Fase 4.4.3: el header de sección lo pone el contenedor (template
+    # legacy/premium). El renderer NO emite su propio <h4> para evitar
+    # duplicación visual ("Lo que cuenta tu estudio" no debe aparecer
+    # dos veces seguidas).
 
     analizado = analisis.get('archivo_fue_analizado', True)
     if analizado is False:
@@ -335,34 +335,32 @@ def render_analisis_narrative(analisis):
 
     if hp or hs or sf:
         parts.append(
-            '<p>De la lectura de tu estudio se observan algunas señales '
-            'que vale la pena acompañar:</p>'
+            '<p style="margin-top:0;">El estudio deja ver algunas '
+            'señales que vale la pena acompañar:</p>'
         )
 
     def _bullets(items, intro=None):
         if not items:
             return
         if intro:
-            parts.append('<p style="margin-bottom:2px;">%s</p>'
+            parts.append('<p style="margin:10px 0 2px 0;color:#5C5752;'
+                         'font-style:italic;">%s</p>'
                          % _html_escape(intro))
-        parts.append('<ul style="margin-top:0;">')
+        parts.append('<ul style="margin-top:0;margin-bottom:6px;">')
         for it in items:
             parts.append('<li>%s</li>'
                          % humanize_text(_html_escape(str(it))))
         parts.append('</ul>')
 
-    # Sin labels técnicos: cada bloque va con su intro narrativa
-    _bullets(hp, 'Lo más relevante:')
-    _bullets(hs, 'Y como complemento, también se observa:')
-    _bullets(sf, 'En cómo se siente el cuerpo, se nota:')
+    # Intros más cálidas y variadas (menos plantilla)
+    _bullets(hp, 'Lo más destacado')
+    _bullets(hs, 'También llaman la atención')
+    _bullets(sf, 'Cómo se está sintiendo el cuerpo')
     if rd:
-        _bullets(rd, 'Aspectos a tener presentes para tu acompañamiento:')
+        _bullets(rd, 'A tener presente en el acompañamiento')
     if pd_:
-        _bullets(pd_, 'Áreas funcionales que pediría apoyo integral:')
+        _bullets(pd_, 'Áreas que pediría apoyo integral')
 
-    parts.append(
-        '<hr style="border:none;border-top:1px dashed #ccc;margin:8px 0;"/>'
-    )
     return ''.join(parts)
 
 
@@ -398,25 +396,41 @@ def render_prioridades_narrative(prioridades):
         importancia = humanize_text(_html_escape(
             entry.get('importancia') or ''))
 
-        parts.append('<li style="margin-bottom:10px;">')
-        parts.append('<b>%s</b>' % titulo)
+        parts.append('<li style="margin-bottom:12px;">')
+        parts.append('<b style="color:#2C2A29;">%s</b>' % titulo)
 
-        # Hilamos los tres subcampos en prosa fluida con conectores
-        # naturales — sin "Evidencia:", "Relación con antecedentes:",
-        # "Importancia:".
+        # Fase 4.4.3: prosa más natural y menos plantilla.
+        # Evitamos conectores rígidos repetitivos ("en tu estudio se
+        # observa que…", "se conecta con tu historia porque…").
+        # Cada oración se imprime tal cual (capitalizada y terminada en
+        # punto), separadas por ' · ' que el ojo lee como continuidad.
         oraciones = []
-        if evidencia and evidencia.strip() not in ('[Sin archivo aprovechable]',):
-            oraciones.append('en tu estudio se observa que ' + evidencia[:1].lower() + evidencia[1:])
+
+        def _clean(frase):
+            """Capitaliza y limpia un fragmento del payload IA."""
+            if not frase:
+                return ''
+            txt = frase.strip().rstrip('.')
+            if not txt:
+                return ''
+            return txt[:1].upper() + txt[1:] + '.'
+
+        if evidencia and evidencia.strip() not in (
+            '[Sin archivo aprovechable]',
+        ):
+            oraciones.append(_clean(evidencia))
         if relacion and relacion.lower().strip() not in (
             'sin relación directa con antecedente declarado',
         ):
-            oraciones.append('se conecta con tu historia porque ' + relacion[:1].lower() + relacion[1:])
+            oraciones.append(_clean(relacion))
         if importancia:
-            oraciones.append(importancia[:1].lower() + importancia[1:])
+            oraciones.append(_clean(importancia))
 
+        oraciones = [o for o in oraciones if o]
         if oraciones:
-            parts.append('<br/><span style="color:#555;">')
-            parts.append('. '.join(o.rstrip('.') for o in oraciones) + '.')
+            parts.append('<br/><span style="color:#5C5752;'
+                         'line-height:1.55;">')
+            parts.append(' · '.join(oraciones))
             parts.append('</span>')
 
         parts.append('</li>')
