@@ -86,7 +86,7 @@
                         }
                         .premium-logo-wrap img {
                             display: inline-block;
-                            max-height: 96px;
+                            max-height: 190px;
                             height: auto;
                             width: auto;
                             max-width: 70%;
@@ -109,7 +109,7 @@
                              interno (no asumimos que sea del archivo).
                              ============================================== -->
                         <div class="avoid-break premium-logo-wrap"
-                             style="padding: 16px 0 20px 0;">
+                             style="padding: 4px 0 4px 0;">
                             <img t-if="doc.company_id.logo"
                                  t-att-src="'data:image/png;base64,%s' % doc.company_id.logo.decode('ascii') if doc.company_id.logo else False"
                                  alt="Logo"/>
