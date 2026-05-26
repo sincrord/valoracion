@@ -86,7 +86,7 @@
                         }
                         .premium-logo-wrap img {
                             display: inline-block;
-                            max-height: 190px;
+                            max-height: 160px;
                             height: auto;
                             width: auto;
                             max-width: 70%;
